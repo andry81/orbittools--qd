@@ -97,6 +97,7 @@ include/qd/c_qd.h -text
 include/qd/dd_inline.h -text
 include/qd/dd_real.h -text
 include/qd/fpu.h -text
+include/qd/globals.h -text
 include/qd/inline.h -text
 include/qd/qd_config.h -text
 include/qd/qd_config.h.in -text

@@ -46,25 +46,22 @@ struct QD_API qd_real {
   qd_real(double x0, double x1, double x2, double x3);
   explicit qd_real(const double *xx);
 
-  static const qd_real c_2pi() { return _2pi; }
-  static const qd_real c_pi() { return _pi; }
+  static const qd_real & _2pi();
+  static const qd_real & _pi();
+  static const qd_real & _3pi4();
+  static const qd_real & _pi2();
+  static const qd_real & _pi4();
+  static const qd_real & _e();
+  static const qd_real & _log2();
+  static const qd_real & _log10();
+  static const qd_real & _nan();
+  static const qd_real & _inf();
 
-  static const qd_real _2pi;
-  static const qd_real _pi;
-  static const qd_real _3pi4;
-  static const qd_real _pi2;
-  static const qd_real _pi4;
-  static const qd_real _e;
-  static const qd_real _log2;
-  static const qd_real _log10;
-  static const qd_real _nan;
-  static const qd_real _inf;
-
-  static const double _eps;
-  static const double _min_normalized;
-  static const qd_real _max;
-  static const qd_real _safe_max;
-  static const int _ndigits;
+  static const double _eps();
+  static const double _min_normalized();
+  static const qd_real & _max();
+  static const qd_real & _safe_max();
+  static const int _ndigits();
 
   qd_real();
   qd_real(const char *s);
@@ -85,10 +82,14 @@ struct QD_API qd_real {
   static qd_real ieee_add(const qd_real &a, const qd_real &b);
   static qd_real sloppy_add(const qd_real &a, const qd_real &b);
 
+  qd_real &operator+=(int a);
+  qd_real &operator+=(int64_t a);
   qd_real &operator+=(double a);
   qd_real &operator+=(const dd_real &a);
   qd_real &operator+=(const qd_real &a);
 
+  qd_real &operator-=(int a);
+  qd_real &operator-=(int64_t a);
   qd_real &operator-=(double a);
   qd_real &operator-=(const dd_real &a);
   qd_real &operator-=(const qd_real &a);
@@ -117,6 +118,8 @@ struct QD_API qd_real {
 
   qd_real operator-() const;
 
+  qd_real &operator=(int a);
+  qd_real &operator=(int64_t a);
   qd_real &operator=(double a);
   qd_real &operator=(const dd_real &a);
   qd_real &operator=(const char *s);
@@ -128,10 +131,10 @@ struct QD_API qd_real {
 
   static qd_real rand(void);
 
-  void to_digits(char *s, int &expn, int precision = _ndigits) const;
-  void write(char *s, int len, int precision = _ndigits, 
+  void to_digits(char *s, int &expn, int precision = _ndigits()) const;
+  void write(char *s, int len, int precision = _ndigits(), 
       bool showpos = false, bool uppercase = false) const;
-  std::string to_string(int precision = _ndigits, int width = 0, 
+  std::string to_string(int precision = _ndigits(), int width = 0, 
       std::ios_base::fmtflags fmt = static_cast<std::ios_base::fmtflags>(0), 
       bool showpos = false, bool uppercase = false, char fill = ' ') const;
   static int read(const char *s, qd_real &a);
@@ -149,10 +152,10 @@ namespace std {
   template <>
   class numeric_limits<qd_real> : public numeric_limits<double> {
   public:
-    inline static double epsilon() { return qd_real::_eps; }
-    inline static double min() { return qd_real::_min_normalized; }
-    inline static qd_real max() { return qd_real::_max; }
-    inline static qd_real safe_max() { return qd_real::_safe_max; }
+    inline static double epsilon() { return qd_real::_eps(); }
+    inline static double (min)() { return qd_real::_min_normalized(); }
+    inline static qd_real (max)() { return qd_real::_max(); }
+    inline static qd_real safe_max() { return qd_real::_safe_max(); }
     static const int digits = 209;
     static const int digits10 = 62;
   };
@@ -179,11 +182,23 @@ QD_API qd_real operator+(const qd_real &a, const dd_real &b);
 QD_API qd_real operator+(const qd_real &a, double b);
 QD_API qd_real operator+(double a, const qd_real &b);
 
+QD_API qd_real operator+(const qd_real &a, int64_t b);
+QD_API qd_real operator+(int64_t a, const qd_real &b);
+
+QD_API qd_real operator+(const qd_real &a, int b);
+QD_API qd_real operator+(int a, const qd_real &b);
+
 QD_API qd_real operator-(const qd_real &a, const qd_real &b);
 QD_API qd_real operator-(const dd_real &a, const qd_real &b);
 QD_API qd_real operator-(const qd_real &a, const dd_real &b);
 QD_API qd_real operator-(const qd_real &a, double b);
 QD_API qd_real operator-(double a, const qd_real &b);
+
+QD_API qd_real operator-(const qd_real &a, int64_t b);
+QD_API qd_real operator-(int64_t a, const qd_real &b);
+
+QD_API qd_real operator-(const qd_real &a, int b);
+QD_API qd_real operator-(int a, const qd_real &b);
 
 QD_API qd_real operator*(const qd_real &a, const qd_real &b);
 QD_API qd_real operator*(const dd_real &a, const qd_real &b);
@@ -301,10 +316,10 @@ QD_API qd_real atanh(const qd_real &a);
 
 QD_API qd_real qdrand(void);
 
-QD_API qd_real max(const qd_real &a, const qd_real &b);
-QD_API qd_real max(const qd_real &a, const qd_real &b, const qd_real &c);
-QD_API qd_real min(const qd_real &a, const qd_real &b);
-QD_API qd_real min(const qd_real &a, const qd_real &b, const qd_real &c);
+QD_API qd_real (max)(const qd_real &a, const qd_real &b);
+QD_API qd_real (max)(const qd_real &a, const qd_real &b, const qd_real &c);
+QD_API qd_real (min)(const qd_real &a, const qd_real &b);
+QD_API qd_real (min)(const qd_real &a, const qd_real &b, const qd_real &c);
 
 QD_API qd_real fmod(const qd_real &a, const qd_real &b);
 

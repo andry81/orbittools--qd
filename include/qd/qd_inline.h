@@ -211,6 +211,16 @@ inline void three_sum2(double &a, double &b, double &c) {
 
 }
 
+/* quad-double + int */
+inline qd_real operator+(const qd_real &a, int b) {
+    return a + qd_real(b);
+}
+
+/* quad-double + int64_t */
+inline qd_real operator+(const qd_real &a, int64_t b) {
+  return a + qd_real(b);
+}
+
 /* quad-double + double */
 inline qd_real operator+(const qd_real &a, double b) {
   double c0, c1, c2, c3;
@@ -247,6 +257,16 @@ inline qd_real operator+(const qd_real &a, const dd_real &b) {
   return qd_real(s0, s1, s2, s3);
 }
 
+
+/* int + quad-double */
+inline qd_real operator+(int a, const qd_real &b) {
+    return (b + a);
+}
+
+/* int64_t + quad-double */
+inline qd_real operator+(int64_t a, const qd_real &b) {
+    return (b + a);
+}
 
 /* double + quad-double */
 inline qd_real operator+(double a, const qd_real &b) {
@@ -422,6 +442,18 @@ inline qd_real operator+(const qd_real &a, const qd_real &b) {
 
 
 /********** Self-Additions ************/
+/* quad-double += int */
+inline qd_real &qd_real::operator+=(int a) {
+    *this = *this + a;
+    return *this;
+}
+
+/* quad-double += int64_t */
+inline qd_real &qd_real::operator+=(int64_t a) {
+    *this = *this + a;
+    return *this;
+}
+
 /* quad-double += double */
 inline qd_real &qd_real::operator+=(double a) {
   *this = *this + a;
@@ -446,6 +478,22 @@ inline qd_real qd_real::operator-() const {
 }
 
 /********** Subtractions **********/
+inline qd_real operator-(const qd_real &a, int b) {
+    return (a + (-b));
+}
+
+inline qd_real operator-(int a, const qd_real &b) {
+    return (a + (-b));
+}
+
+inline qd_real operator-(const qd_real &a, int64_t b) {
+    return (a + (-b));
+}
+
+inline qd_real operator-(int64_t a, const qd_real &b) {
+    return (a + (-b));
+}
+
 inline qd_real operator-(const qd_real &a, double b) {
   return (a + (-b));
 }
@@ -467,6 +515,14 @@ inline qd_real operator-(const qd_real &a, const qd_real &b) {
 }
 
 /********** Self-Subtractions **********/
+inline qd_real &qd_real::operator-=(int a) {
+    return ((*this) += (-a));
+}
+
+inline qd_real &qd_real::operator-=(int64_t a) {
+    return ((*this) += (-a));
+}
+
 inline qd_real &qd_real::operator-=(double a) {
   return ((*this) += (-a));
 }
@@ -859,6 +915,18 @@ inline qd_real quick_nint(const qd_real &a) {
 }
 
 /*********** Assignments ************/
+/* quad-double = int */
+inline qd_real &qd_real::operator=(int a) {
+  *this = qd_real(a);
+  return *this;
+}
+
+/* quad-double = int64_t */
+inline qd_real &qd_real::operator=(int64_t a) {
+  *this = qd_real(a);
+  return *this;
+}
+
 /* quad-double = double */
 inline qd_real &qd_real::operator=(double a) {
   x[0] = a;
@@ -1064,20 +1132,20 @@ inline qd_real inv(const qd_real &qd) {
   return 1.0 / qd;
 }
 
-inline qd_real max(const qd_real &a, const qd_real &b) {
+inline qd_real (max)(const qd_real &a, const qd_real &b) {
   return (a > b) ? a : b;
 }
 
-inline qd_real max(const qd_real &a, const qd_real &b, 
+inline qd_real (max)(const qd_real &a, const qd_real &b, 
                    const qd_real &c) {
   return (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
 }
 
-inline qd_real min(const qd_real &a, const qd_real &b) {
+inline qd_real (min)(const qd_real &a, const qd_real &b) {
   return (a < b) ? a : b;
 }
 
-inline qd_real min(const qd_real &a, const qd_real &b, 
+inline qd_real (min)(const qd_real &a, const qd_real &b, 
                    const qd_real &c) {
   return (a < b) ? ((a < c) ? a : c) : ((b < c) ? b : c);
 }

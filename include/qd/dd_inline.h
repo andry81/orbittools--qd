@@ -99,6 +99,18 @@ inline dd_real operator+(double a, const dd_real &b) {
 
 
 /*********** Self-Additions ************/
+/* double-double += int */
+inline dd_real &dd_real::operator+=(int a) {
+  *this += dd_real(a);
+  return *this;
+}
+
+/* double-double += int64_t */
+inline dd_real &dd_real::operator+=(int64_t a) {
+  *this += dd_real(a);
+  return *this;
+}
+
 /* double-double += double */
 inline dd_real &dd_real::operator+=(double a) {
   double s1, s2;
@@ -197,6 +209,18 @@ inline dd_real operator-(double a, const dd_real &b) {
 }
 
 /*********** Self-Subtractions ************/
+/* double-double -= int */
+inline dd_real &dd_real::operator-=(int a) {
+  *this -= dd_real(a);
+  return *this;
+}
+
+/* double-double -= int64_t */
+inline dd_real &dd_real::operator-=(int64_t a) {
+  *this -= dd_real(a);
+  return *this;
+}
+
 /* double-double -= double */
 inline dd_real &dd_real::operator-=(double a) {
   double s1, s2;

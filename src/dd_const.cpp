@@ -10,54 +10,64 @@
 #include "config.h"
 #include <qd/dd_real.h>
 
-const dd_real dd_real::_2pi()
+const dd_real & dd_real::_2pi()
 {
-  return dd_real(6.283185307179586232e+00, 2.449293598294706414e-16);
+  static const dd_real r = dd_real(6.283185307179586232e+00, 2.449293598294706414e-16);
+  return r;
 }
 
-const dd_real dd_real::_pi()
+const dd_real & dd_real::_pi()
 {
-  return dd_real(3.141592653589793116e+00, 1.224646799147353207e-16);
+  static const dd_real r = dd_real(3.141592653589793116e+00, 1.224646799147353207e-16);
+  return r;
 }
 
-const dd_real dd_real::_pi2()
+const dd_real & dd_real::_pi2()
 {
-  return dd_real(1.570796326794896558e+00, 6.123233995736766036e-17);
+  static const dd_real r = dd_real(1.570796326794896558e+00, 6.123233995736766036e-17);
+  return r;
 }
 
-const dd_real dd_real::_pi4()
+const dd_real & dd_real::_pi4()
 {
-  return dd_real(7.853981633974482790e-01, 3.061616997868383018e-17);
+  static const dd_real r = dd_real(7.853981633974482790e-01, 3.061616997868383018e-17);
+  return r;
 }
 
-const dd_real dd_real::_3pi4()
+const dd_real & dd_real::_3pi4()
 {
-  return dd_real(2.356194490192344837e+00, 9.1848509936051484375e-17);
+  static const dd_real r = dd_real(2.356194490192344837e+00, 9.1848509936051484375e-17);
+  return r;
 }
 
-const dd_real dd_real::_e()
+const dd_real & dd_real::_e()
 {
-  return dd_real(2.718281828459045091e+00, 1.445646891729250158e-16);
+  static const dd_real r = dd_real(2.718281828459045091e+00, 1.445646891729250158e-16);
+  return r;
 }
 
-const dd_real dd_real::_log2()
+const dd_real & dd_real::_log2()
 {
-  return dd_real(6.931471805599452862e-01, 2.319046813846299558e-17);
+  static const dd_real r = dd_real(6.931471805599452862e-01, 2.319046813846299558e-17);
+  return r;
 }
 
-const dd_real dd_real::_log10()
+const dd_real & dd_real::_log10()
 {
-  return dd_real(2.302585092994045901e+00, -2.170756223382249351e-16);
+  static const dd_real r = dd_real(2.302585092994045901e+00, -2.170756223382249351e-16);
+  return r;
 }
 
-const dd_real dd_real::_nan()
+const dd_real & dd_real::_nan()
 {
-  return dd_real(qd::_d_nan, qd::_d_nan);
+  static const dd_real r = dd_real(qd::_d_nan, qd::_d_nan);
+  return r;
 }
 
-const dd_real dd_real::_inf()
+const dd_real & dd_real::_inf()
 {
-  return dd_real(qd::_d_inf, qd::_d_inf);
+  static const dd_real r = dd_real(qd::_d_inf, qd::_d_inf);
+  return r;
 }
 
 const double dd_real::_eps()
@@ -70,14 +80,16 @@ const double dd_real::_min_normalized()
   return 2.0041683600089728e-292;  // = 2^(-1022 + 53)
 }
 
-const dd_real dd_real::_max()
+const dd_real & dd_real::_max()
 {
-  return dd_real(1.79769313486231570815e+308, 9.97920154767359795037e+291);
+  static const dd_real r = dd_real(1.79769313486231570815e+308, 9.97920154767359795037e+291);
+  return r;
 }
 
-const dd_real dd_real::_safe_max()
+const dd_real & dd_real::_safe_max()
 {
-  return dd_real(1.7976931080746007281e+308, 9.97920154767359795037e+291);
+  static const dd_real r = dd_real(1.7976931080746007281e+308, 9.97920154767359795037e+291);
+  return r;
 }
 
 const int dd_real::_ndigits()

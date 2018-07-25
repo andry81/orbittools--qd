@@ -85,21 +85,21 @@ struct QD_API dd_real {
   double _hi() const { return x[0]; }
   double _lo() const { return x[1]; }
 
-  static const dd_real _2pi();
-  static const dd_real _pi();
-  static const dd_real _3pi4();
-  static const dd_real _pi2();
-  static const dd_real _pi4();
-  static const dd_real _e();
-  static const dd_real _log2();
-  static const dd_real _log10();
-  static const dd_real _nan();
-  static const dd_real _inf();
+  static const dd_real & _2pi();
+  static const dd_real & _pi();
+  static const dd_real & _3pi4();
+  static const dd_real & _pi2();
+  static const dd_real & _pi4();
+  static const dd_real & _e();
+  static const dd_real & _log2();
+  static const dd_real & _log10();
+  static const dd_real & _nan();
+  static const dd_real & _inf();
 
   static const double _eps();
   static const double _min_normalized();
-  static const dd_real _max();
-  static const dd_real _safe_max();
+  static const dd_real & _max();
+  static const dd_real & _safe_max();
   static const int _ndigits();
 
   bool isnan() const { return QD_ISNAN(x[0]) || QD_ISNAN(x[1]); }
@@ -110,11 +110,15 @@ struct QD_API dd_real {
   static dd_real ieee_add(const dd_real &a, const dd_real &b);
   static dd_real sloppy_add(const dd_real &a, const dd_real &b);
 
+  dd_real &operator+=(int a);
+  dd_real &operator+=(int64_t a);
   dd_real &operator+=(double a);
   dd_real &operator+=(const dd_real &a);
 
   static dd_real sub(double a, double b);
 
+  dd_real &operator-=(int a);
+  dd_real &operator-=(int64_t a);
   dd_real &operator-=(double a);
   dd_real &operator-=(const dd_real &a);
 

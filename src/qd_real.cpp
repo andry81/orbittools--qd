@@ -180,14 +180,14 @@ qd_real operator/(const qd_real &a, double b) {
 qd_real::qd_real(const char *s) {
   if (qd_real::read(s, *this)) {
     qd_real::error("(qd_real::qd_real): INPUT ERROR.");
-    *this = qd_real::_nan;
+    *this = qd_real::_nan();
   }
 }
 
 qd_real &qd_real::operator=(const char *s) {
   if (qd_real::read(s, *this)) {
     qd_real::error("(qd_real::operator=): INPUT ERROR.");
-    *this = qd_real::_nan;
+    *this = qd_real::_nan();
   }
   return *this;
 }
@@ -820,7 +820,7 @@ QD_API qd_real sqrt(const qd_real &a) {
 
   if (a.is_negative()) {
     qd_real::error("(qd_real::sqrt): Negative argument.");
-    return qd_real::_nan;
+    return qd_real::_nan();
   }
 
   qd_real r = (1.0 / std::sqrt(a[0]));
@@ -851,12 +851,12 @@ qd_real nroot(const qd_real &a, int n) {
    */
 	if (n <= 0) {
 		qd_real::error("(qd_real::nroot): N must be positive.");
-		return qd_real::_nan;
+		return qd_real::_nan();
 	}
 
 	if (n % 2 == 0 && a.is_negative()) {
 		qd_real::error("(qd_real::nroot): Negative argument.");
-		return qd_real::_nan;
+		return qd_real::_nan();
 	}
 
 	if (n == 1) {
@@ -936,18 +936,18 @@ qd_real exp(const qd_real &a) {
     return 0.0;
 
   if (a[0] >=  709.0)
-    return qd_real::_inf;
+    return qd_real::_inf();
 
   if (a.is_zero())
     return 1.0;
 
   if (a.is_one())
-    return qd_real::_e;
+    return qd_real::_e();
 
-  double m = std::floor(a.x[0] / qd_real::_log2.x[0] + 0.5);
-  qd_real r = mul_pwr2(a - qd_real::_log2 * m, inv_k);
+  double m = std::floor(a.x[0] / qd_real::_log2().x[0] + 0.5);
+  qd_real r = mul_pwr2(a - qd_real::_log2() * m, inv_k);
   qd_real s, p, t;
-  double thresh = inv_k * qd_real::_eps;
+  double thresh = inv_k * qd_real::_eps();
 
   p = sqr(r);
   s = r + mul_pwr2(p, 0.5);
@@ -1003,11 +1003,11 @@ qd_real log(const qd_real &a) {
 
   if (a[0] <= 0.0) {
     qd_real::error("(qd_real::log): Non-positive argument.");
-    return qd_real::_nan;
+    return qd_real::_nan();
   }
 
   if (a[0] == 0.0) {
-    return -qd_real::_inf;
+    return -qd_real::_inf();
   }
 
   qd_real x = std::log(a[0]);   /* Initial approximation */
@@ -1020,7 +1020,7 @@ qd_real log(const qd_real &a) {
 }
 
 qd_real log10(const qd_real &a) {
-  return log(a) / qd_real::_log10;
+  return log(a) / qd_real::_log10();
 }
 
 static const qd_real _pi1024 = qd_real(
@@ -2062,7 +2062,7 @@ static const qd_real cos_table [] = {
    Assumes |a| <= pi/2048.                           */
 static void sincos_taylor(const qd_real &a, 
                           qd_real &sin_a, qd_real &cos_a) {
-  const double thresh = 0.5 * qd_real::_eps * std::abs(to_double(a));
+  const double thresh = 0.5 * qd_real::_eps() * std::abs(to_double(a));
   qd_real p, s, t, x;
 
   if (a.is_zero()) {
@@ -2087,7 +2087,7 @@ static void sincos_taylor(const qd_real &a,
 }
 
 static qd_real sin_taylor(const qd_real &a) {
-  const double thresh = 0.5 * qd_real::_eps * std::abs(to_double(a));
+  const double thresh = 0.5 * qd_real::_eps() * std::abs(to_double(a));
   qd_real p, s, t, x;
 
   if (a.is_zero()) {
@@ -2109,7 +2109,7 @@ static qd_real sin_taylor(const qd_real &a) {
 }
 
 static qd_real cos_taylor(const qd_real &a) {
-  const double thresh = 0.5 * qd_real::_eps;
+  const double thresh = 0.5 * qd_real::_eps();
   qd_real p, s, t, x;
 
   if (a.is_zero()) {
@@ -2146,12 +2146,12 @@ qd_real sin(const qd_real &a) {
   }
 
   // approximately reduce modulo 2*pi
-  qd_real z = nint(a / qd_real::_2pi);
-  qd_real r = a - qd_real::_2pi * z;
+  qd_real z = nint(a / qd_real::_2pi());
+  qd_real r = a - qd_real::_2pi() * z;
 
   // approximately reduce modulo pi/2 and then modulo pi/1024
-  double q = std::floor(r.x[0] / qd_real::_pi2[0] + 0.5);
-  qd_real t = r - qd_real::_pi2 * q;
+  double q = std::floor(r.x[0] / qd_real::_pi2()[0] + 0.5);
+  qd_real t = r - qd_real::_pi2() * q;
   int j = static_cast<int>(q);
   q = std::floor(t.x[0] / _pi1024[0] + 0.5);
   t -= _pi1024 * q;
@@ -2160,12 +2160,12 @@ qd_real sin(const qd_real &a) {
 
   if (j < -2 || j > 2) {
     qd_real::error("(qd_real::sin): Cannot reduce modulo pi/2.");
-    return qd_real::_nan;
+    return qd_real::_nan();
   }
 
   if (abs_k > 256) {
     qd_real::error("(qd_real::sin): Cannot reduce modulo pi/1024.");
-    return qd_real::_nan;
+    return qd_real::_nan();
   }
 
   if (k == 0) {
@@ -2222,12 +2222,12 @@ qd_real cos(const qd_real &a) {
   }
 
   // approximately reduce modulo 2*pi
-  qd_real z = nint(a / qd_real::_2pi);
-  qd_real r = a - qd_real::_2pi * z;
+  qd_real z = nint(a / qd_real::_2pi());
+  qd_real r = a - qd_real::_2pi() * z;
 
   // approximately reduce modulo pi/2 and then modulo pi/1024
-  double q = std::floor(r.x[0] / qd_real::_pi2.x[0] + 0.5);
-  qd_real t = r - qd_real::_pi2 * q;
+  double q = std::floor(r.x[0] / qd_real::_pi2().x[0] + 0.5);
+  qd_real t = r - qd_real::_pi2() * q;
   int j = static_cast<int>(q);
   q = std::floor(t.x[0] / _pi1024.x[0] + 0.5);
   t -= _pi1024 * q;
@@ -2236,12 +2236,12 @@ qd_real cos(const qd_real &a) {
 
   if (j < -2 || j > 2) {
     qd_real::error("(qd_real::cos): Cannot reduce modulo pi/2.");
-    return qd_real::_nan;
+    return qd_real::_nan();
   }
 
   if (abs_k > 256) {
     qd_real::error("(qd_real::cos): Cannot reduce modulo pi/1024.");
-    return qd_real::_nan;
+    return qd_real::_nan();
   }
 
   if (k == 0) {
@@ -2301,12 +2301,12 @@ void sincos(const qd_real &a, qd_real &sin_a, qd_real &cos_a) {
   }
 
   // approximately reduce by 2*pi
-  qd_real z = nint(a / qd_real::_2pi);
-  qd_real t = a - qd_real::_2pi * z;
+  qd_real z = nint(a / qd_real::_2pi());
+  qd_real t = a - qd_real::_2pi() * z;
 
   // approximately reduce by pi/2 and then by pi/1024.
-  double q = std::floor(t.x[0] / qd_real::_pi2.x[0] + 0.5);
-  t -= qd_real::_pi2 * q;
+  double q = std::floor(t.x[0] / qd_real::_pi2().x[0] + 0.5);
+  t -= qd_real::_pi2() * q;
   int j = static_cast<int>(q);
   q = std::floor(t.x[0] / _pi1024.x[0] + 0.5);
   t -= _pi1024 * q;
@@ -2315,13 +2315,13 @@ void sincos(const qd_real &a, qd_real &sin_a, qd_real &cos_a) {
 
   if (j < -2 || j > 2) {
     qd_real::error("(qd_real::sincos): Cannot reduce modulo pi/2.");
-    cos_a = sin_a = qd_real::_nan;
+    cos_a = sin_a = qd_real::_nan();
     return;
   }
 
   if (abs_k > 256) {
     qd_real::error("(qd_real::sincos): Cannot reduce modulo pi/1024.");
-    cos_a = sin_a = qd_real::_nan;
+    cos_a = sin_a = qd_real::_nan();
     return;
   }
 
@@ -2410,20 +2410,20 @@ qd_real atan2(const qd_real &y, const qd_real &x) {
     if (y.is_zero()) {
       /* Both x and y is zero. */
       qd_real::error("(qd_real::atan2): Both arguments zero.");
-      return qd_real::_nan;
+      return qd_real::_nan();
     }
 
-    return (y.is_positive()) ? qd_real::_pi2 : -qd_real::_pi2;
+    return (y.is_positive()) ? qd_real::_pi2() : -qd_real::_pi2();
   } else if (y.is_zero()) {
-    return (x.is_positive()) ? qd_real(0.0) : qd_real::_pi;
+    return (x.is_positive()) ? qd_real(0.0) : qd_real::_pi();
   }
 
   if (x == y) {
-    return (y.is_positive()) ? qd_real::_pi4 : -qd_real::_3pi4;
+    return (y.is_positive()) ? qd_real::_pi4() : -qd_real::_3pi4();
   }
 
   if (x == -y) {
-    return (y.is_positive()) ? qd_real::_3pi4 : -qd_real::_pi4;
+    return (y.is_positive()) ? qd_real::_3pi4() : -qd_real::_pi4();
   }
 
   qd_real r = sqrt(sqr(x) + sqr(y));
@@ -2478,11 +2478,11 @@ qd_real asin(const qd_real &a) {
 
   if (abs_a > 1.0) {
     qd_real::error("(qd_real::asin): Argument out of domain.");
-    return qd_real::_nan;
+    return qd_real::_nan();
   }
 
   if (abs_a.is_one()) {
-    return (a.is_positive()) ? qd_real::_pi2 : -qd_real::_pi2;
+    return (a.is_positive()) ? qd_real::_pi2() : -qd_real::_pi2();
   }
 
   return atan2(a, sqrt(1.0 - sqr(a)));
@@ -2493,11 +2493,11 @@ qd_real acos(const qd_real &a) {
 
   if (abs_a > 1.0) {
     qd_real::error("(qd_real::acos): Argument out of domain.");
-    return qd_real::_nan;
+    return qd_real::_nan();
   }
 
   if (abs_a.is_one()) {
-    return (a.is_positive()) ? qd_real(0.0) : qd_real::_pi;
+    return (a.is_positive()) ? qd_real(0.0) : qd_real::_pi();
   }
 
   return atan2(sqrt(1.0 - sqr(a)), a);
@@ -2519,7 +2519,7 @@ qd_real sinh(const qd_real &a) {
   qd_real t = a;
   qd_real r = sqr(t);
   double m = 1.0;
-  double thresh = std::abs(to_double(a) * qd_real::_eps);
+  double thresh = std::abs(to_double(a) * qd_real::_eps());
 
   do {
     m += 2.0;
@@ -2577,7 +2577,7 @@ qd_real asinh(const qd_real &a) {
 qd_real acosh(const qd_real &a) {
   if (a < 1.0) {
     qd_real::error("(qd_real::acosh): Argument out of domain.");
-    return qd_real::_nan;
+    return qd_real::_nan();
   }
 
   return log(a + sqrt(sqr(a) - 1.0));
@@ -2586,7 +2586,7 @@ qd_real acosh(const qd_real &a) {
 qd_real atanh(const qd_real &a) {
   if (abs(a) >= 1.0) {
     qd_real::error("(qd_real::atanh): Argument out of domain.");
-    return qd_real::_nan;
+    return qd_real::_nan();
   }
 
   return mul_pwr2(log((1.0 + a) / (1.0 - a)), 0.5);
@@ -2645,7 +2645,7 @@ QD_API qd_real polyroot(const qd_real *c, int n,
   double max_c = std::abs(to_double(c[0]));
   double v;
 
-  if (thresh == 0.0) thresh = qd_real::_eps;
+  if (thresh == 0.0) thresh = qd_real::_eps();
 
   /* Compute the coefficients of the derivatives. */
   for (i = 1; i <= n; i++) {
@@ -2669,7 +2669,7 @@ QD_API qd_real polyroot(const qd_real *c, int n,
 
   if (!conv) {
     qd_real::error("(qd_real::polyroot): Failed to converge.");
-    return qd_real::_nan;
+    return qd_real::_nan();
   }
 
   return x;
