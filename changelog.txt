@@ -1,3 +1,9 @@
+2018.07.23:
+* fixed: 3dparty QD dd_real::pow in case of zero values
+
+2018.07.20:
+* fixed: 3dparty QD dd_real::pow does not expect negative first value even if second value is equal to an integer but not an integer type
+
 2018.07.16:
 * new: changelog
 * new: initial patched sources fork

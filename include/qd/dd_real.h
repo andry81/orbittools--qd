@@ -244,9 +244,11 @@ QD_API dd_real drem(const dd_real &a, const dd_real &b);
 QD_API dd_real divrem(const dd_real &a, const dd_real &b, dd_real &r);
 
 QD_API dd_real pow(const dd_real &a, int n);
+QD_API dd_real pow(const dd_real &a, int64_t n);
 QD_API dd_real pow(const dd_real &a, double b);
 QD_API dd_real pow(const dd_real &a, const dd_real &b);
 QD_API dd_real npwr(const dd_real &a, int n);
+QD_API dd_real npwr(const dd_real &a, int64_t n);
 QD_API dd_real sqr(const dd_real &a);
 
 QD_API dd_real sqrt(const dd_real &a);

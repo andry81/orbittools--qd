@@ -159,16 +159,73 @@ dd_real npwr(const dd_real &a, int n) {
   return s;
 }
 
+/* Computes the n-th power of a double-double number. 
+   NOTE:  0^0 causes an error.                         */
+dd_real npwr(const dd_real &a, int64_t n) {
+  
+  if (n == 0) {
+    if (a.is_zero()) {
+      dd_real::error("(dd_real::npwr): Invalid argument.");
+      return dd_real::_nan();
+    }
+    return 1.0;
+  }
+
+  dd_real r = a;
+  dd_real s = 1.0;
+  int64_t N = std::abs(n);
+
+  if (N > 1) {
+    /* Use binary exponentiation */
+    while (N > 0) {
+      if (N % 2 == 1) {
+        s *= r;
+      }
+      N /= 2;
+      if (N > 0)
+        r = sqr(r);
+    }
+  } else {
+    s = r;
+  }
+
+  /* Compute the reciprocal if n is negative. */
+  if (n < 0)
+    return (1.0 / s);
+  
+  return s;
+}
+
 dd_real pow(const dd_real &a, int n) {
   return npwr(a, n);
 }
 
+dd_real pow(const dd_real &a, int64_t n) {
+    return npwr(a, n);
+}
+
 dd_real pow(const dd_real &a, double b) {
+  // behaviour similar to standard C pow function
+  if (a == 0.0 && b != 0.0) return 0;
+
+  const int64_t bi = int64_t(b);
+  if (a >= 0 || b != double(bi)) {
     return exp(b * log(a));
+  }
+
+  return npwr(a, bi);
 }
 
 dd_real pow(const dd_real &a, const dd_real &b) {
-  return exp(b * log(a));
+  // behaviour similar to standard C pow function
+  if (a == 0.0 && b != 0.0) return 0;
+
+  const int64_t bi = int64_t(to_double(b));
+  if (a >= 0 || b != double(bi)) {
+    return exp(b * log(a));
+  }
+
+  return npwr(a, bi);
 }
 
 static const int n_inv_fact = 15;
