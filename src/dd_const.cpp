@@ -70,12 +70,12 @@ const dd_real & dd_real::_inf()
   return r;
 }
 
-const double dd_real::_eps()
+double dd_real::_eps()
 {
   return 4.93038065763132e-32;  // 2^-104
 }
 
-const double dd_real::_min_normalized()
+double dd_real::_min_normalized()
 {
   return 2.0041683600089728e-292;  // = 2^(-1022 + 53)
 }
@@ -92,7 +92,7 @@ const dd_real & dd_real::_safe_max()
   return r;
 }
 
-const int dd_real::_ndigits()
+int dd_real::_ndigits()
 {
   return 31;
 }

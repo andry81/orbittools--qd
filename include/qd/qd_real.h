@@ -57,11 +57,11 @@ struct QD_API qd_real {
   static const qd_real & _nan();
   static const qd_real & _inf();
 
-  static const double _eps();
-  static const double _min_normalized();
+  static double _eps();
+  static double _min_normalized();
   static const qd_real & _max();
   static const qd_real & _safe_max();
-  static const int _ndigits();
+  static int _ndigits();
 
   qd_real();
   qd_real(const char *s);

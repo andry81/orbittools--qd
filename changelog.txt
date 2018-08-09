@@ -1,3 +1,6 @@
+2018.08.09:
+* fixed: linux build
+
 2018.07.25:
 * fixed: min/max macro definitions
 * new: implemented more missed operators in dd_real/qd_real

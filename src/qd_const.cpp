@@ -99,12 +99,12 @@ const qd_real & qd_real::_inf()
   return r;
 }
 
-const double qd_real::_eps()
+double qd_real::_eps()
 {
   return 1.21543267145725e-63; // = 2^-209
 }
 
-const double qd_real::_min_normalized()
+double qd_real::_min_normalized()
 {
   return 1.6259745436952323e-260; // = 2^(-1022 + 3*53)
 }
@@ -125,7 +125,7 @@ const qd_real & qd_real::_safe_max()
   return r;
 }
 
-const int qd_real::_ndigits()
+int qd_real::_ndigits()
 {
   return 62;
 }

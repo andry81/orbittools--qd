@@ -96,11 +96,11 @@ struct QD_API dd_real {
   static const dd_real & _nan();
   static const dd_real & _inf();
 
-  static const double _eps();
-  static const double _min_normalized();
+  static double _eps();
+  static double _min_normalized();
   static const dd_real & _max();
   static const dd_real & _safe_max();
-  static const int _ndigits();
+  static int _ndigits();
 
   bool isnan() const { return QD_ISNAN(x[0]) || QD_ISNAN(x[1]); }
   bool isfinite() const { return QD_ISFINITE(x[0]); }
