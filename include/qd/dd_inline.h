@@ -264,9 +264,11 @@ inline dd_real dd_real::mul(double a, double b) {
   return dd_real(p, e);
 }
 
-/* double-double * (2.0 ^ exp) */
-inline dd_real ldexp(const dd_real &a, int exp) {
-  return dd_real(std::ldexp(a.x[0], exp), std::ldexp(a.x[1], exp));
+namespace std {
+    /* double-double * (2.0 ^ exp) */
+    inline dd_real ldexp(const dd_real &a, int exp) {
+        return dd_real(std::ldexp(a.x[0], exp), std::ldexp(a.x[1], exp));
+    }
 }
 
 /* double-double * double,  where double is a power of 2. */
@@ -672,13 +674,15 @@ inline bool dd_real::is_negative() const {
   return (x[0] < 0.0);
 }
 
-/* Absolute value */
-inline dd_real abs(const dd_real &a) {
-  return (a.x[0] < 0.0) ? -a : a;
-}
+namespace std {
+    /* Absolute value */
+    inline dd_real abs(const dd_real &a) {
+        return (a.x[0] < 0.0) ? -a : a;
+    }
 
-inline dd_real fabs(const dd_real &a) {
-  return abs(a);
+    inline dd_real fabs(const dd_real &a) {
+        return abs(a);
+    }
 }
 
 /* Round to Nearest integer */
@@ -705,34 +709,36 @@ inline dd_real nint(const dd_real &a) {
   return dd_real(hi, lo);
 }
 
-inline dd_real floor(const dd_real &a) {
-  double hi = std::floor(a.x[0]);
-  double lo = 0.0;
+namespace std {
+    inline dd_real floor(const dd_real &a) {
+        double hi = std::floor(a.x[0]);
+        double lo = 0.0;
 
-  if (hi == a.x[0]) {
-    /* High word is integer already.  Round the low word. */
-    lo = std::floor(a.x[1]);
-    hi = qd::quick_two_sum(hi, lo, lo);
-  }
+        if (hi == a.x[0]) {
+            /* High word is integer already.  Round the low word. */
+            lo = std::floor(a.x[1]);
+            hi = qd::quick_two_sum(hi, lo, lo);
+        }
 
-  return dd_real(hi, lo);
-}
+        return dd_real(hi, lo);
+    }
 
-inline dd_real ceil(const dd_real &a) {
-  double hi = std::ceil(a.x[0]);
-  double lo = 0.0;
+    inline dd_real ceil(const dd_real &a) {
+        double hi = std::ceil(a.x[0]);
+        double lo = 0.0;
 
-  if (hi == a.x[0]) {
-    /* High word is integer already.  Round the low word. */
-    lo = std::ceil(a.x[1]);
-    hi = qd::quick_two_sum(hi, lo, lo);
-  }
+        if (hi == a.x[0]) {
+            /* High word is integer already.  Round the low word. */
+            lo = std::ceil(a.x[1]);
+            hi = qd::quick_two_sum(hi, lo, lo);
+        }
 
-  return dd_real(hi, lo);
+        return dd_real(hi, lo);
+    }
 }
 
 inline dd_real aint(const dd_real &a) {
-  return (a.x[0] >= 0.0) ? floor(a) : ceil(a);
+  return (a.x[0] >= 0.0) ? std::floor(a) : std::ceil(a);
 }
 
 /* Cast to double. */

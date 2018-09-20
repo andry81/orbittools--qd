@@ -131,6 +131,9 @@
 /* Define to 1 to inline commonly used functions. */
 #undef QD_INLINE
 
+/* Define this macro to be the isnormal(x) function. */
+#undef QD_ISNORMAL
+
 /* Define this macro to be the isfinite(x) function. */
 #undef QD_ISFINITE
 

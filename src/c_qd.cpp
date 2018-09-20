@@ -239,7 +239,7 @@ void c_qd_copy_d(double a, double *b) {
 
 void c_qd_sqrt(const double *a, double *b) {
   qd_real bb;
-  bb = sqrt(qd_real(a));
+  bb = std::sqrt(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_qd_sqr(const double *a, double *b) {
@@ -250,7 +250,7 @@ void c_qd_sqr(const double *a, double *b) {
 
 void c_qd_abs(const double *a, double *b) {
   qd_real bb;
-  bb = abs(qd_real(a));
+  bb = std::abs(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 
@@ -278,98 +278,98 @@ void c_qd_aint(const double *a, double *b) {
 }
 void c_qd_floor(const double *a, double *b) {
   qd_real bb;
-  bb = floor(qd_real(a));
+  bb = std::floor(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_qd_ceil(const double *a, double *b) {
   qd_real bb;
-  bb = ceil(qd_real(a));
+  bb = std::ceil(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 
 void c_qd_log(const double *a, double *b) {
   qd_real bb;
-  bb = log(qd_real(a));
+  bb = std::log(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_qd_log10(const double *a, double *b) {
   qd_real bb;
-  bb = log10(qd_real(a));
+  bb = std::log10(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_qd_exp(const double *a, double *b) {
   qd_real bb;
-  bb = exp(qd_real(a));
+  bb = std::exp(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 
 void c_qd_sin(const double *a, double *b) {
   qd_real bb;
-  bb = sin(qd_real(a));
+  bb = std::sin(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_qd_cos(const double *a, double *b) {
   qd_real bb;
-  bb = cos(qd_real(a));
+  bb = std::cos(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_qd_tan(const double *a, double *b) {
   qd_real bb;
-  bb = tan(qd_real(a));
+  bb = std::tan(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 
 void c_qd_asin(const double *a, double *b) {
   qd_real bb;
-  bb = asin(qd_real(a));
+  bb = std::asin(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_qd_acos(const double *a, double *b) {
   qd_real bb;
-  bb = acos(qd_real(a));
+  bb = std::acos(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_qd_atan(const double *a, double *b) {
   qd_real bb;
-  bb = atan(qd_real(a));
+  bb = std::atan(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 
 void c_qd_atan2(const double *a, const double *b, double *c) {
   qd_real cc;
-  cc = atan2(qd_real(a), qd_real(b));
+  cc = std::atan2(qd_real(a), qd_real(b));
   TO_DOUBLE_PTR(cc, c);
 }
 
 void c_qd_sinh(const double *a, double *b) {
   qd_real bb;
-  bb = sinh(qd_real(a));
+  bb = std::sinh(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_qd_cosh(const double *a, double *b) {
   qd_real bb;
-  bb = cosh(qd_real(a));
+  bb = std::cosh(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_qd_tanh(const double *a, double *b) {
   qd_real bb;
-  bb = tanh(qd_real(a));
+  bb = std::tanh(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 
 void c_qd_asinh(const double *a, double *b) {
   qd_real bb;
-  bb = asinh(qd_real(a));
+  bb = std::asinh(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_qd_acosh(const double *a, double *b) {
   qd_real bb;
-  bb = acosh(qd_real(a));
+  bb = std::acosh(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_qd_atanh(const double *a, double *b) {
   qd_real bb;
-  bb = atanh(qd_real(a));
+  bb = std::atanh(qd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 

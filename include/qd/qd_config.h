@@ -69,6 +69,11 @@
 #define QD_SLOPPY_DIV 1
 #endif
 
+   /* Define this macro to be the isnormal(x) function. */
+#ifndef QD_ISNORMAL
+#define QD_ISNORMAL(x) std::isnormal(x)
+#endif
+
 /* Define this macro to be the isfinite(x) function. */
 #ifndef QD_ISFINITE
 #define QD_ISFINITE(x) std::isfinite(x)

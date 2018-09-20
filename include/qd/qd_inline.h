@@ -72,6 +72,10 @@ inline double &qd_real::operator[](int i) {
   return x[i];
 }
 
+inline bool qd_real::isnormal() const {
+    return QD_ISNORMAL(x[0]) && QD_ISNORMAL(x[1]) && QD_ISNORMAL(x[2]) && QD_ISNORMAL(x[3]);
+}
+
 inline bool qd_real::isnan() const {
   return QD_ISNAN(x[0]) || QD_ISNAN(x[1]) || QD_ISNAN(x[2]) || QD_ISNAN(x[3]);
 }
@@ -893,16 +897,18 @@ inline qd_real &qd_real::operator/=(const qd_real &a) {
 
 /********** Exponentiation **********/
 inline qd_real qd_real::operator^(int n) const {
-  return pow(*this, n);
+  return std::pow(*this, n);
 }
 
-/********** Miscellaneous **********/
-inline qd_real abs(const qd_real &a) {
-  return (a[0] < 0.0) ? -a : a;
-}
+namespace std {
+    /********** Miscellaneous **********/
+    inline qd_real abs(const qd_real &a) {
+        return (a[0] < 0.0) ? -a : a;
+    }
 
-inline qd_real fabs(const qd_real &a) {
-  return abs(a);
+    inline qd_real fabs(const qd_real &a) {
+        return std::abs(a);
+    }
 }
 
 /* Quick version.  May be off by one when qd is very close
@@ -1097,7 +1103,7 @@ inline bool operator!=(const qd_real &a, const qd_real &b) {
 
 
 inline qd_real aint(const qd_real &a) {
-  return (a[0] >= 0) ? floor(a) : ceil(a);
+  return (a[0] >= 0) ? std::floor(a) : std::ceil(a);
 }
 
 inline bool qd_real::is_zero() const {
@@ -1132,22 +1138,24 @@ inline qd_real inv(const qd_real &qd) {
   return 1.0 / qd;
 }
 
-inline qd_real (max)(const qd_real &a, const qd_real &b) {
-  return (a > b) ? a : b;
-}
+namespace std {
+    inline qd_real(max)(const qd_real &a, const qd_real &b) {
+        return (a > b) ? a : b;
+    }
 
-inline qd_real (max)(const qd_real &a, const qd_real &b, 
-                   const qd_real &c) {
-  return (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
-}
+    inline qd_real(max)(const qd_real &a, const qd_real &b,
+        const qd_real &c) {
+        return (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
+    }
 
-inline qd_real (min)(const qd_real &a, const qd_real &b) {
-  return (a < b) ? a : b;
-}
+    inline qd_real(min)(const qd_real &a, const qd_real &b) {
+        return (a < b) ? a : b;
+    }
 
-inline qd_real (min)(const qd_real &a, const qd_real &b, 
-                   const qd_real &c) {
-  return (a < b) ? ((a < c) ? a : c) : ((b < c) ? b : c);
+    inline qd_real(min)(const qd_real &a, const qd_real &b,
+        const qd_real &c) {
+        return (a < b) ? ((a < c) ? a : c) : ((b < c) ? b : c);
+    }
 }
 
 /* Random number generator */
@@ -1155,9 +1163,11 @@ inline qd_real qd_real::rand() {
   return qdrand();
 }
 
-inline qd_real ldexp(const qd_real &a, int n) {
-  return qd_real(std::ldexp(a[0], n), std::ldexp(a[1], n), 
-                 std::ldexp(a[2], n), std::ldexp(a[3], n));
+namespace std {
+    inline qd_real ldexp(const qd_real &a, int n) {
+        return qd_real(std::ldexp(a[0], n), std::ldexp(a[1], n),
+            std::ldexp(a[2], n), std::ldexp(a[3], n));
+    }
 }
 
 #endif /* _QD_QD_INLINE_H */

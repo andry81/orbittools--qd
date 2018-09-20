@@ -16,7 +16,7 @@
 
 #ifdef X86
 #ifdef  _WIN32
-#include <float.h>
+#include <cfloat>
 #else
 
 #ifdef HAVE_FPU_CONTROL_H

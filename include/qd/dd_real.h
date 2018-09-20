@@ -34,12 +34,17 @@
 #include <iostream>
 #include <string>
 #include <limits>
+#include <type_traits>
 #include <qd/qd_config.h>
 #include <qd/fpu.h>
 
 // Some compilers define isnan, isfinite, and isinf as macros, even for
 // C++ codes, which cause havoc when overloading these functions.  We undef
 // them here.
+#ifdef isnormal
+#undef isnormal
+#endif
+
 #ifdef isnan
 #undef isnan
 #endif
@@ -102,6 +107,7 @@ struct QD_API dd_real {
   static const dd_real & _safe_max();
   static int _ndigits();
 
+  bool isnormal() const { return QD_ISNORMAL(x[0]) && QD_ISNORMAL(x[1]); }
   bool isnan() const { return QD_ISNAN(x[0]) || QD_ISNAN(x[1]); }
   bool isfinite() const { return QD_ISFINITE(x[0]); }
   bool isinf() const { return QD_ISINF(x[0]); }
@@ -185,18 +191,45 @@ namespace std {
     static const int digits = 104;
     static const int digits10 = 31;
   };
+
+  // integration with type traits
+  template <>
+  struct is_floating_point<dd_real> : true_type
+  {
+  };
+
+  template <>
+  struct is_signed<dd_real> : true_type
+  {
+  };
+
+  template <>
+  struct is_unsigned<dd_real> : false_type
+  {
+  };
+
+  template <>
+  struct is_integral<dd_real> : false_type
+  {
+  };
 }
 
 QD_API dd_real ddrand(void);
-QD_API dd_real sqrt(const dd_real &a);
+
+namespace std {
+    QD_API dd_real sqrt(const dd_real &a);
+}
 
 QD_API dd_real polyeval(const dd_real *c, int n, const dd_real &x);
 QD_API dd_real polyroot(const dd_real *c, int n, 
     const dd_real &x0, int max_iter = 32, double thresh = 0.0);
 
-QD_API inline bool isnan(const dd_real &a) { return a.isnan(); }
-QD_API inline bool isfinite(const dd_real &a) { return a.isfinite(); }
-QD_API inline bool isinf(const dd_real &a) { return a.isinf(); }
+namespace std {
+    QD_API inline bool isnormal(const dd_real &a) { return a.isnormal(); }
+    QD_API inline bool isnan(const dd_real &a) { return a.isnan(); }
+    QD_API inline bool isfinite(const dd_real &a) { return a.isfinite(); }
+    QD_API inline bool isinf(const dd_real &a) { return a.isinf(); }
+}
 
 /* Computes  dd * d  where d is known to be a power of 2. */
 QD_API dd_real mul_pwr2(const dd_real &dd, double d);
@@ -247,15 +280,21 @@ QD_API dd_real rem(const dd_real &a, const dd_real &b);
 QD_API dd_real drem(const dd_real &a, const dd_real &b);
 QD_API dd_real divrem(const dd_real &a, const dd_real &b, dd_real &r);
 
-QD_API dd_real pow(const dd_real &a, int n);
-QD_API dd_real pow(const dd_real &a, int64_t n);
-QD_API dd_real pow(const dd_real &a, double b);
-QD_API dd_real pow(const dd_real &a, const dd_real &b);
+namespace std {
+    QD_API dd_real pow(const dd_real &a, int n);
+    QD_API dd_real pow(const dd_real &a, int64_t n);
+    QD_API dd_real pow(const dd_real &a, double b);
+    QD_API dd_real pow(const dd_real &a, const dd_real &b);
+}
+
 QD_API dd_real npwr(const dd_real &a, int n);
 QD_API dd_real npwr(const dd_real &a, int64_t n);
 QD_API dd_real sqr(const dd_real &a);
 
-QD_API dd_real sqrt(const dd_real &a);
+namespace std {
+    QD_API dd_real sqrt(const dd_real &a);
+}
+
 QD_API dd_real nroot(const dd_real &a, int n);
 
 QD_API bool operator==(const dd_real &a, double b);
@@ -283,8 +322,12 @@ QD_API bool operator!=(double a, const dd_real &b);
 QD_API bool operator!=(const dd_real &a, const dd_real &b);
 
 QD_API dd_real nint(const dd_real &a);
-QD_API dd_real floor(const dd_real &a);
-QD_API dd_real ceil(const dd_real &a);
+
+namespace std {
+    QD_API dd_real floor(const dd_real &a);
+    QD_API dd_real ceil(const dd_real &a);
+}
+
 QD_API dd_real aint(const dd_real &a);
 
 QD_API dd_real ddrand(void);
@@ -292,35 +335,46 @@ QD_API dd_real ddrand(void);
 double to_double(const dd_real &a);
 int    to_int(const dd_real &a);
 
-QD_API dd_real exp(const dd_real &a);
-QD_API dd_real ldexp(const dd_real &a, int exp);
-QD_API dd_real log(const dd_real &a);
-QD_API dd_real log10(const dd_real &a);
+namespace std {
+    QD_API dd_real exp(const dd_real &a);
+    QD_API dd_real ldexp(const dd_real &a, int exp);
+    QD_API dd_real log(const dd_real &a);
+    QD_API dd_real log10(const dd_real &a);
 
-QD_API dd_real sin(const dd_real &a);
-QD_API dd_real cos(const dd_real &a);
-QD_API dd_real tan(const dd_real &a);
+    QD_API dd_real sin(const dd_real &a);
+    QD_API dd_real cos(const dd_real &a);
+    QD_API dd_real tan(const dd_real &a);
+}
+
 QD_API void sincos(const dd_real &a, dd_real &sin_a, dd_real &cos_a);
 
-QD_API dd_real asin(const dd_real &a);
-QD_API dd_real acos(const dd_real &a);
-QD_API dd_real atan(const dd_real &a);
-QD_API dd_real atan2(const dd_real &y, const dd_real &x);
+namespace std {
+    QD_API dd_real asin(const dd_real &a);
+    QD_API dd_real acos(const dd_real &a);
+    QD_API dd_real atan(const dd_real &a);
+    QD_API dd_real atan2(const dd_real &y, const dd_real &x);
 
-QD_API dd_real sinh(const dd_real &a);
-QD_API dd_real cosh(const dd_real &a);
-QD_API dd_real tanh(const dd_real &a);
-QD_API void sincosh(const dd_real &a, 
-                      dd_real &sinh_a, dd_real &cosh_a);
+    QD_API dd_real sinh(const dd_real &a);
+    QD_API dd_real cosh(const dd_real &a);
+    QD_API dd_real tanh(const dd_real &a);
+}
 
-QD_API dd_real asinh(const dd_real &a);
-QD_API dd_real acosh(const dd_real &a);
-QD_API dd_real atanh(const dd_real &a);
+    QD_API void sincosh(const dd_real &a,
+        dd_real &sinh_a, dd_real &cosh_a);
 
-QD_API dd_real fabs(const dd_real &a);
-QD_API dd_real abs(const dd_real &a);   /* same as fabs */
+namespace std {
+    QD_API dd_real asinh(const dd_real &a);
+    QD_API dd_real acosh(const dd_real &a);
+    QD_API dd_real atanh(const dd_real &a);
 
-QD_API dd_real fmod(const dd_real &a, const dd_real &b);
+    QD_API dd_real fabs(const dd_real &a);
+    QD_API dd_real abs(const dd_real &a);   /* same as fabs */
+
+    QD_API dd_real fmod(const dd_real &a, const dd_real &b);
+    QD_API dd_real fmod(const dd_real &a, double b);
+    QD_API dd_real fmod(const dd_real &a, int64_t b);
+    QD_API dd_real fmod(const dd_real &a, int b);
+}
 
 QD_API std::ostream& operator<<(std::ostream &s, const dd_real &a);
 QD_API std::istream& operator>>(std::istream &s, dd_real &a);

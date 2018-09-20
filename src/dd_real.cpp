@@ -43,36 +43,38 @@ void dd_real::error(const char *msg) {
   if (msg) { cerr << "ERROR " << msg << endl; }
 }
 
-/* Computes the square root of the double-double number dd.
-   NOTE: dd must be a non-negative number.                   */
-QD_API dd_real sqrt(const dd_real &a) {
-  /* Strategy:  Use Karp's trick:  if x is an approximation
-     to sqrt(a), then
+namespace std {
+    /* Computes the square root of the double-double number dd.
+       NOTE: dd must be a non-negative number.                   */
+    QD_API dd_real sqrt(const dd_real &a) {
+        /* Strategy:  Use Karp's trick:  if x is an approximation
+           to sqrt(a), then
 
-        sqrt(a) = a*x + [a - (a*x)^2] * x / 2   (approx)
+              sqrt(a) = a*x + [a - (a*x)^2] * x / 2   (approx)
 
-     The approximation is accurate to twice the accuracy of x.
-     Also, the multiplication (a*x) and [-]*x can be done with
-     only half the precision.
-  */
+           The approximation is accurate to twice the accuracy of x.
+           Also, the multiplication (a*x) and [-]*x can be done with
+           only half the precision.
+        */
 
-  if (a.is_zero())
-    return 0.0;
+        if (a.is_zero())
+            return 0.0;
 
-  if (a.is_negative()) {
-    dd_real::error("(dd_real::sqrt): Negative argument.");
-    return dd_real::_nan();
-  }
+        if (a.is_negative()) {
+            dd_real::error("(dd_real::sqrt): Negative argument.");
+            return dd_real::_nan();
+        }
 
-  double x = 1.0 / std::sqrt(a.x[0]);
-  double ax = a.x[0] * x;
-  return dd_real::add(ax, (a - dd_real::sqr(ax)).x[0] * (x * 0.5));
+        double x = 1.0 / std::sqrt(a.x[0]);
+        double ax = a.x[0] * x;
+        return dd_real::add(ax, (a - dd_real::sqr(ax)).x[0] * (x * 0.5));
+    }
 }
 
-/* Computes the square root of a double in double-double precision. 
-   NOTE: d must not be negative.                                   */
+/* Computes the square root of a double in double-double precision.
+    NOTE: d must not be negative.                                   */
 dd_real dd_real::sqrt(double d) {
-  return ::sqrt(dd_real(d));
+  return std::sqrt(dd_real(d));
 }
 
 /* Computes the n-th root of the double-double number a.
@@ -105,14 +107,14 @@ dd_real nroot(const dd_real &a, int n) {
     return a;
   } 
   if (n == 2) {
-    return sqrt(a);
+    return std::sqrt(a);
   }
 
   if (a.is_zero())
     return 0.0;
 
   /* Note  a^{-1/n} = exp(-log(a)/n) */
-  dd_real r = abs(a);
+  dd_real r = std::abs(a);
   dd_real x = std::exp(-std::log(r.x[0]) / n);
 
   /* Perform Newton's iteration. */
@@ -196,36 +198,38 @@ dd_real npwr(const dd_real &a, int64_t n) {
   return s;
 }
 
-dd_real pow(const dd_real &a, int n) {
-  return npwr(a, n);
-}
+namespace std {
+    dd_real pow(const dd_real &a, int n) {
+        return npwr(a, n);
+    }
 
-dd_real pow(const dd_real &a, int64_t n) {
-    return npwr(a, n);
-}
+    dd_real pow(const dd_real &a, int64_t n) {
+        return npwr(a, n);
+    }
 
-dd_real pow(const dd_real &a, double b) {
-  // behaviour similar to standard C pow function
-  if (a == 0.0 && b != 0.0) return 0;
+    dd_real pow(const dd_real &a, double b) {
+        // behaviour similar to standard C pow function
+        if (a == 0.0 && b != 0.0) return 0;
 
-  const int64_t bi = int64_t(b);
-  if (a >= 0 || b != double(bi)) {
-    return exp(b * log(a));
-  }
+        const int64_t bi = int64_t(b);
+        if (a >= 0 || b != double(bi)) {
+            return std::exp(b * std::log(a));
+        }
 
-  return npwr(a, bi);
-}
+        return npwr(a, bi);
+    }
 
-dd_real pow(const dd_real &a, const dd_real &b) {
-  // behaviour similar to standard C pow function
-  if (a == 0.0 && b != 0.0) return 0;
+    dd_real pow(const dd_real &a, const dd_real &b) {
+        // behaviour similar to standard C pow function
+        if (a == 0.0 && b != 0.0) return 0;
 
-  const int64_t bi = int64_t(to_double(b));
-  if (a >= 0 || b != double(bi)) {
-    return exp(b * log(a));
-  }
+        const int64_t bi = int64_t(to_double(b));
+        if (a >= 0 || b != double(bi)) {
+            return std::exp(b * log(a));
+        }
 
-  return npwr(a, bi);
+        return npwr(a, bi);
+    }
 }
 
 static const int n_inv_fact = 15;
@@ -247,100 +251,102 @@ static const double inv_fact[n_inv_fact][2] = {
   { 2.81145725434552060e-15,  1.65088427308614326e-31}
 };
 
-/* Exponential.  Computes exp(x) in double-double precision. */
-dd_real exp(const dd_real &a) {
-  /* Strategy:  We first reduce the size of x by noting that
-     
-          exp(kr + m * log(2)) = 2^m * exp(r)^k
+namespace std {
+    /* Exponential.  Computes exp(x) in double-double precision. */
+    dd_real exp(const dd_real &a) {
+        /* Strategy:  We first reduce the size of x by noting that
 
-     where m and k are integers.  By choosing m appropriately
-     we can make |kr| <= log(2) / 2 = 0.347.  Then exp(r) is 
-     evaluated using the familiar Taylor series.  Reducing the 
-     argument substantially speeds up the convergence.       */  
+                exp(kr + m * log(2)) = 2^m * exp(r)^k
 
-  const double k = 512.0;
-  const double inv_k = 1.0 / k;
+           where m and k are integers.  By choosing m appropriately
+           we can make |kr| <= log(2) / 2 = 0.347.  Then exp(r) is
+           evaluated using the familiar Taylor series.  Reducing the
+           argument substantially speeds up the convergence.       */
 
-  if (a.x[0] <= -709.0)
-    return 0.0;
+        const double k = 512.0;
+        const double inv_k = 1.0 / k;
 
-  if (a.x[0] >=  709.0)
-    return dd_real::_inf();
+        if (a.x[0] <= -709.0)
+            return 0.0;
 
-  if (a.is_zero())
-    return 1.0;
+        if (a.x[0] >= 709.0)
+            return dd_real::_inf();
 
-  if (a.is_one())
-    return dd_real::_e();
+        if (a.is_zero())
+            return 1.0;
 
-  double m = std::floor(a.x[0] / dd_real::_log2().x[0] + 0.5);
-  dd_real r = mul_pwr2(a - dd_real::_log2() * m, inv_k);
-  dd_real s, t, p;
+        if (a.is_one())
+            return dd_real::_e();
 
-  p = sqr(r);
-  s = r + mul_pwr2(p, 0.5);
-  p *= r;
-  t = p * dd_real(inv_fact[0][0], inv_fact[0][1]);
-  int i = 0;
-  do {
-    s += t;
-    p *= r;
-    ++i;
-    t = p * dd_real(inv_fact[i][0], inv_fact[i][1]);
-  } while (std::abs(to_double(t)) > inv_k * dd_real::_eps() && i < 5);
+        double m = std::floor(a.x[0] / dd_real::_log2().x[0] + 0.5);
+        dd_real r = mul_pwr2(a - dd_real::_log2() * m, inv_k);
+        dd_real s, t, p;
 
-  s += t;
+        p = sqr(r);
+        s = r + mul_pwr2(p, 0.5);
+        p *= r;
+        t = p * dd_real(inv_fact[0][0], inv_fact[0][1]);
+        int i = 0;
+        do {
+            s += t;
+            p *= r;
+            ++i;
+            t = p * dd_real(inv_fact[i][0], inv_fact[i][1]);
+        } while (std::abs(to_double(t)) > inv_k * dd_real::_eps() && i < 5);
 
-  s = mul_pwr2(s, 2.0) + sqr(s);
-  s = mul_pwr2(s, 2.0) + sqr(s);
-  s = mul_pwr2(s, 2.0) + sqr(s);
-  s = mul_pwr2(s, 2.0) + sqr(s);
-  s = mul_pwr2(s, 2.0) + sqr(s);
-  s = mul_pwr2(s, 2.0) + sqr(s);
-  s = mul_pwr2(s, 2.0) + sqr(s);
-  s = mul_pwr2(s, 2.0) + sqr(s);
-  s = mul_pwr2(s, 2.0) + sqr(s);
-  s += 1.0;
+        s += t;
 
-  return ldexp(s, static_cast<int>(m));
-}
+        s = mul_pwr2(s, 2.0) + sqr(s);
+        s = mul_pwr2(s, 2.0) + sqr(s);
+        s = mul_pwr2(s, 2.0) + sqr(s);
+        s = mul_pwr2(s, 2.0) + sqr(s);
+        s = mul_pwr2(s, 2.0) + sqr(s);
+        s = mul_pwr2(s, 2.0) + sqr(s);
+        s = mul_pwr2(s, 2.0) + sqr(s);
+        s = mul_pwr2(s, 2.0) + sqr(s);
+        s = mul_pwr2(s, 2.0) + sqr(s);
+        s += 1.0;
 
-/* Logarithm.  Computes log(x) in double-double precision.
-   This is a natural logarithm (i.e., base e).            */
-dd_real log(const dd_real &a) {
-  /* Strategy.  The Taylor series for log converges much more
-     slowly than that of exp, due to the lack of the factorial
-     term in the denominator.  Hence this routine instead tries
-     to determine the root of the function
+        return std::ldexp(s, static_cast<int>(m));
+    }
 
-         f(x) = exp(x) - a
+    /* Logarithm.  Computes log(x) in double-double precision.
+       This is a natural logarithm (i.e., base e).            */
+    dd_real log(const dd_real &a) {
+        /* Strategy.  The Taylor series for log converges much more
+           slowly than that of exp, due to the lack of the factorial
+           term in the denominator.  Hence this routine instead tries
+           to determine the root of the function
 
-     using Newton iteration.  The iteration is given by
+               f(x) = exp(x) - a
 
-         x' = x - f(x)/f'(x) 
-            = x - (1 - a * exp(-x))
-            = x + a * exp(-x) - 1.
-           
-     Only one iteration is needed, since Newton's iteration
-     approximately doubles the number of digits per iteration. */
+           using Newton iteration.  The iteration is given by
 
-  if (a.is_one()) {
-    return 0.0;
-  }
+               x' = x - f(x)/f'(x)
+                  = x - (1 - a * exp(-x))
+                  = x + a * exp(-x) - 1.
 
-  if (a.x[0] <= 0.0) {
-    dd_real::error("(dd_real::log): Non-positive argument.");
-    return dd_real::_nan();
-  }
+           Only one iteration is needed, since Newton's iteration
+           approximately doubles the number of digits per iteration. */
 
-  dd_real x = std::log(a.x[0]);   /* Initial approximation */
+        if (a.is_one()) {
+            return 0.0;
+        }
 
-  x = x + a * exp(-x) - 1.0;
-  return x;
-}
+        if (a.x[0] <= 0.0) {
+            dd_real::error("(dd_real::log): Non-positive argument.");
+            return dd_real::_nan();
+        }
 
-dd_real log10(const dd_real &a) {
-  return log(a) / dd_real::_log10();
+        dd_real x = std::log(a.x[0]);   /* Initial approximation */
+
+        x = x + a * std::exp(-x) - 1.0;
+        return x;
+    }
+
+    dd_real log10(const dd_real &a) {
+        return std::log(a) / dd_real::_log10();
+    }
 }
 
 static const dd_real _pi16 = dd_real(1.963495408493620697e-01,
@@ -416,172 +422,188 @@ static void sincos_taylor(const dd_real &a,
   }
 
   sin_a = sin_taylor(a);
-  cos_a = sqrt(1.0 - sqr(sin_a));
+  cos_a = std::sqrt(1.0 - sqr(sin_a));
 }
 
 
-dd_real sin(const dd_real &a) {  
+namespace std {
+    dd_real sin(const dd_real &a) {
 
-  /* Strategy.  To compute sin(x), we choose integers a, b so that
+        /* Strategy.  To compute sin(x), we choose integers a, b so that
 
-       x = s + a * (pi/2) + b * (pi/16)
+             x = s + a * (pi/2) + b * (pi/16)
 
-     and |s| <= pi/32.  Using the fact that 
+           and |s| <= pi/32.  Using the fact that
 
-       sin(pi/16) = 0.5 * sqrt(2 - sqrt(2 + sqrt(2)))
+             sin(pi/16) = 0.5 * sqrt(2 - sqrt(2 + sqrt(2)))
 
-     we can compute sin(x) from sin(s), cos(s).  This greatly 
-     increases the convergence of the sine Taylor series. */
+           we can compute sin(x) from sin(s), cos(s).  This greatly
+           increases the convergence of the sine Taylor series. */
 
-  if (a.is_zero()) {
-    return 0.0;
-  }
+        if (a.is_zero()) {
+            return 0.0;
+        }
 
-  // approximately reduce modulo 2*pi
-  dd_real z = nint(a / dd_real::_2pi());
-  dd_real r = a - dd_real::_2pi() * z;
+        // approximately reduce modulo 2*pi
+        dd_real z = nint(a / dd_real::_2pi());
+        dd_real r = a - dd_real::_2pi() * z;
 
-  // approximately reduce modulo pi/2 and then modulo pi/16.
-  dd_real t;
-  double q = std::floor(r.x[0] / dd_real::_pi2().x[0] + 0.5);
-  t = r - dd_real::_pi2() * q;
-  int j = static_cast<int>(q);
-  q = std::floor(t.x[0] / _pi16.x[0] + 0.5);
-  t -= _pi16 * q;
-  int k = static_cast<int>(q);
-  int abs_k = std::abs(k);
+        // approximately reduce modulo pi/2 and then modulo pi/16.
+        dd_real t;
+        double q = std::floor(r.x[0] / dd_real::_pi2().x[0] + 0.5);
+        t = r - dd_real::_pi2() * q;
+        int j = static_cast<int>(q);
+        q = std::floor(t.x[0] / _pi16.x[0] + 0.5);
+        t -= _pi16 * q;
+        int k = static_cast<int>(q);
+        int abs_k = std::abs(k);
 
-  if (j < -2 || j > 2) {
-    dd_real::error("(dd_real::sin): Cannot reduce modulo pi/2.");
-    return dd_real::_nan();
-  }
+        if (j < -2 || j > 2) {
+            dd_real::error("(dd_real::sin): Cannot reduce modulo pi/2.");
+            return dd_real::_nan();
+        }
 
-  if (abs_k > 4) {
-    dd_real::error("(dd_real::sin): Cannot reduce modulo pi/16.");
-    return dd_real::_nan();
-  }
+        if (abs_k > 4) {
+            dd_real::error("(dd_real::sin): Cannot reduce modulo pi/16.");
+            return dd_real::_nan();
+        }
 
-  if (k == 0) {
-    switch (j) {
-      case 0:
-        return sin_taylor(t);
-      case 1:
-        return cos_taylor(t);
-      case -1:
-        return -cos_taylor(t);
-      default:
-        return -sin_taylor(t);
+        if (k == 0) {
+            switch (j) {
+            case 0:
+                return sin_taylor(t);
+            case 1:
+                return cos_taylor(t);
+            case -1:
+                return -cos_taylor(t);
+            default:
+                return -sin_taylor(t);
+            }
+        }
+
+        dd_real u(cos_table[abs_k - 1][0], cos_table[abs_k - 1][1]);
+        dd_real v(sin_table[abs_k - 1][0], sin_table[abs_k - 1][1]);
+        dd_real sin_t, cos_t;
+        sincos_taylor(t, sin_t, cos_t);
+        if (j == 0) {
+            if (k > 0) {
+                r = u * sin_t + v * cos_t;
+            }
+            else {
+                r = u * sin_t - v * cos_t;
+            }
+        }
+        else if (j == 1) {
+            if (k > 0) {
+                r = u * cos_t - v * sin_t;
+            }
+            else {
+                r = u * cos_t + v * sin_t;
+            }
+        }
+        else if (j == -1) {
+            if (k > 0) {
+                r = v * sin_t - u * cos_t;
+            }
+            else if (k < 0) {
+                r = -u * cos_t - v * sin_t;
+            }
+        }
+        else {
+            if (k > 0) {
+                r = -u * sin_t - v * cos_t;
+            }
+            else {
+                r = v * cos_t - u * sin_t;
+            }
+        }
+
+        return r;
     }
-  }
 
-  dd_real u(cos_table[abs_k-1][0], cos_table[abs_k-1][1]);
-  dd_real v(sin_table[abs_k-1][0], sin_table[abs_k-1][1]);
-  dd_real sin_t, cos_t;
-  sincos_taylor(t, sin_t, cos_t);
-  if (j == 0) {
-    if (k > 0) {
-      r = u * sin_t + v * cos_t;
-    } else {
-      r = u * sin_t - v * cos_t;
+    dd_real cos(const dd_real &a) {
+
+        if (a.is_zero()) {
+            return 1.0;
+        }
+
+        // approximately reduce modulo 2*pi
+        dd_real z = nint(a / dd_real::_2pi());
+        dd_real r = a - z * dd_real::_2pi();
+
+        // approximately reduce modulo pi/2 and then modulo pi/16
+        dd_real t;
+        double q = std::floor(r.x[0] / dd_real::_pi2().x[0] + 0.5);
+        t = r - dd_real::_pi2() * q;
+        int j = static_cast<int>(q);
+        q = std::floor(t.x[0] / _pi16.x[0] + 0.5);
+        t -= _pi16 * q;
+        int k = static_cast<int>(q);
+        int abs_k = std::abs(k);
+
+        if (j < -2 || j > 2) {
+            dd_real::error("(dd_real::cos): Cannot reduce modulo pi/2.");
+            return dd_real::_nan();
+        }
+
+        if (abs_k > 4) {
+            dd_real::error("(dd_real::cos): Cannot reduce modulo pi/16.");
+            return dd_real::_nan();
+        }
+
+        if (k == 0) {
+            switch (j) {
+            case 0:
+                return cos_taylor(t);
+            case 1:
+                return -sin_taylor(t);
+            case -1:
+                return sin_taylor(t);
+            default:
+                return -cos_taylor(t);
+            }
+        }
+
+        dd_real sin_t, cos_t;
+        sincos_taylor(t, sin_t, cos_t);
+        dd_real u(cos_table[abs_k - 1][0], cos_table[abs_k - 1][1]);
+        dd_real v(sin_table[abs_k - 1][0], sin_table[abs_k - 1][1]);
+
+        if (j == 0) {
+            if (k > 0) {
+                r = u * cos_t - v * sin_t;
+            }
+            else {
+                r = u * cos_t + v * sin_t;
+            }
+        }
+        else if (j == 1) {
+            if (k > 0) {
+                r = -u * sin_t - v * cos_t;
+            }
+            else {
+                r = v * cos_t - u * sin_t;
+            }
+        }
+        else if (j == -1) {
+            if (k > 0) {
+                r = u * sin_t + v * cos_t;
+            }
+            else {
+                r = u * sin_t - v * cos_t;
+            }
+        }
+        else {
+            if (k > 0) {
+                r = v * sin_t - u * cos_t;
+            }
+            else {
+                r = -u * cos_t - v * sin_t;
+            }
+        }
+
+        return r;
     }
-  } else if (j == 1) {
-    if (k > 0) {
-      r = u * cos_t - v * sin_t;
-    } else {
-      r = u * cos_t + v * sin_t;
-    }
-  } else if (j == -1) {
-    if (k > 0) {
-      r = v * sin_t - u * cos_t;
-    } else if (k < 0) {
-      r = -u * cos_t - v * sin_t;
-    }
-  } else {
-    if (k > 0) {
-      r = -u * sin_t - v * cos_t;
-    } else {
-      r = v * cos_t - u * sin_t;
-    }
-  }
-
-  return r;
-}
-
-dd_real cos(const dd_real &a) {
-
-  if (a.is_zero()) {
-    return 1.0;
-  }
-
-  // approximately reduce modulo 2*pi
-  dd_real z = nint(a / dd_real::_2pi());
-  dd_real r = a - z * dd_real::_2pi();
-
-  // approximately reduce modulo pi/2 and then modulo pi/16
-  dd_real t;
-  double q = std::floor(r.x[0] / dd_real::_pi2().x[0] + 0.5);
-  t = r - dd_real::_pi2() * q;
-  int j = static_cast<int>(q);
-  q = std::floor(t.x[0] / _pi16.x[0] + 0.5);
-  t -= _pi16 * q;
-  int k = static_cast<int>(q);
-  int abs_k = std::abs(k);
-
-  if (j < -2 || j > 2) {
-    dd_real::error("(dd_real::cos): Cannot reduce modulo pi/2.");
-    return dd_real::_nan();
-  }
-
-  if (abs_k > 4) {
-    dd_real::error("(dd_real::cos): Cannot reduce modulo pi/16.");
-    return dd_real::_nan();
-  }
-
-  if (k == 0) {
-    switch (j) {
-      case 0:
-        return cos_taylor(t);
-      case 1:
-        return -sin_taylor(t);
-      case -1:
-        return sin_taylor(t);
-      default:
-        return -cos_taylor(t);
-    }
-  }
-
-  dd_real sin_t, cos_t;
-  sincos_taylor(t, sin_t, cos_t);
-  dd_real u(cos_table[abs_k-1][0], cos_table[abs_k-1][1]);
-  dd_real v(sin_table[abs_k-1][0], sin_table[abs_k-1][1]);
-
-  if (j == 0) {
-    if (k > 0) {
-      r = u * cos_t - v * sin_t;
-    } else {
-      r = u * cos_t + v * sin_t;
-    }
-  } else if (j == 1) {
-    if (k > 0) {
-      r = - u * sin_t - v * cos_t;
-    } else {
-      r = v * cos_t - u * sin_t;
-    }
-  } else if (j == -1) {
-    if (k > 0) {
-      r = u * sin_t + v * cos_t;
-    } else {
-      r = u * sin_t - v * cos_t;
-    }
-  } else {
-    if (k > 0) {
-      r = v * sin_t - u * cos_t;
-    } else {
-      r = - u * cos_t - v * sin_t;
-    }
-  }
-
-  return r;
 }
 
 void sincos(const dd_real &a, dd_real &sin_a, dd_real &cos_a) {
@@ -656,199 +678,221 @@ void sincos(const dd_real &a, dd_real &sin_a, dd_real &cos_a) {
   
 }
 
-dd_real atan(const dd_real &a) {
-  return atan2(a, dd_real(1.0));
-}
-
-dd_real atan2(const dd_real &y, const dd_real &x) {
-  /* Strategy: Instead of using Taylor series to compute 
-     arctan, we instead use Newton's iteration to solve
-     the equation
-
-        sin(z) = y/r    or    cos(z) = x/r
-
-     where r = sqrt(x^2 + y^2).
-     The iteration is given by
-
-        z' = z + (y - sin(z)) / cos(z)          (for equation 1)
-        z' = z - (x - cos(z)) / sin(z)          (for equation 2)
-
-     Here, x and y are normalized so that x^2 + y^2 = 1.
-     If |x| > |y|, then first iteration is used since the 
-     denominator is larger.  Otherwise, the second is used.
-  */
-
-  if (x.is_zero()) {
-    
-    if (y.is_zero()) {
-      /* Both x and y is zero. */
-      dd_real::error("(dd_real::atan2): Both arguments zero.");
-      return dd_real::_nan();
+namespace std {
+    dd_real atan(const dd_real &a) {
+        return std::atan2(a, dd_real(1.0));
     }
 
-    return (y.is_positive()) ? dd_real::_pi2() : -dd_real::_pi2();
-  } else if (y.is_zero()) {
-    return (x.is_positive()) ? dd_real(0.0) : dd_real::_pi();
-  }
+    dd_real atan2(const dd_real &y, const dd_real &x) {
+        /* Strategy: Instead of using Taylor series to compute
+           arctan, we instead use Newton's iteration to solve
+           the equation
 
-  if (x == y) {
-    return (y.is_positive()) ? dd_real::_pi4() : -dd_real::_3pi4();
-  }
+              sin(z) = y/r    or    cos(z) = x/r
 
-  if (x == -y) {
-    return (y.is_positive()) ? dd_real::_3pi4() : -dd_real::_pi4();
-  }
+           where r = sqrt(x^2 + y^2).
+           The iteration is given by
 
-  dd_real r = sqrt(sqr(x) + sqr(y));
-  dd_real xx = x / r;
-  dd_real yy = y / r;
+              z' = z + (y - sin(z)) / cos(z)          (for equation 1)
+              z' = z - (x - cos(z)) / sin(z)          (for equation 2)
 
-  /* Compute double precision approximation to atan. */
-  dd_real z = std::atan2(to_double(y), to_double(x));
-  dd_real sin_z, cos_z;
+           Here, x and y are normalized so that x^2 + y^2 = 1.
+           If |x| > |y|, then first iteration is used since the
+           denominator is larger.  Otherwise, the second is used.
+        */
 
-  if (std::abs(xx.x[0]) > std::abs(yy.x[0])) {
-    /* Use Newton iteration 1.  z' = z + (y - sin(z)) / cos(z)  */
-    sincos(z, sin_z, cos_z);
-    z += (yy - sin_z) / cos_z;
-  } else {
-    /* Use Newton iteration 2.  z' = z - (x - cos(z)) / sin(z)  */
-    sincos(z, sin_z, cos_z);
-    z -= (xx - cos_z) / sin_z;
-  }
+        if (x.is_zero()) {
 
-  return z;
-}
+            if (y.is_zero()) {
+                /* Both x and y is zero. */
+                dd_real::error("(dd_real::atan2): Both arguments zero.");
+                return dd_real::_nan();
+            }
 
-dd_real tan(const dd_real &a) {
-  dd_real s, c;
-  sincos(a, s, c);
-  return s/c;
-}
+            return (y.is_positive()) ? dd_real::_pi2() : -dd_real::_pi2();
+        }
+        else if (y.is_zero()) {
+            return (x.is_positive()) ? dd_real(0.0) : dd_real::_pi();
+        }
 
-dd_real asin(const dd_real &a) {
-  dd_real abs_a = abs(a);
+        if (x == y) {
+            return (y.is_positive()) ? dd_real::_pi4() : -dd_real::_3pi4();
+        }
 
-  if (abs_a > 1.0) {
-    dd_real::error("(dd_real::asin): Argument out of domain.");
-    return dd_real::_nan();
-  }
+        if (x == -y) {
+            return (y.is_positive()) ? dd_real::_3pi4() : -dd_real::_pi4();
+        }
 
-  if (abs_a.is_one()) {
-    return (a.is_positive()) ? dd_real::_pi2() : -dd_real::_pi2();
-  }
+        dd_real r = std::sqrt(sqr(x) + sqr(y));
+        dd_real xx = x / r;
+        dd_real yy = y / r;
 
-  return atan2(a, sqrt(1.0 - sqr(a)));
-}
+        /* Compute double precision approximation to atan. */
+        dd_real z = std::atan2(to_double(y), to_double(x));
+        dd_real sin_z, cos_z;
 
-dd_real acos(const dd_real &a) {
-  dd_real abs_a = abs(a);
+        if (std::abs(xx.x[0]) > std::abs(yy.x[0])) {
+            /* Use Newton iteration 1.  z' = z + (y - sin(z)) / cos(z)  */
+            sincos(z, sin_z, cos_z);
+            z += (yy - sin_z) / cos_z;
+        }
+        else {
+            /* Use Newton iteration 2.  z' = z - (x - cos(z)) / sin(z)  */
+            sincos(z, sin_z, cos_z);
+            z -= (xx - cos_z) / sin_z;
+        }
 
-  if (abs_a > 1.0) {
-    dd_real::error("(dd_real::acos): Argument out of domain.");
-    return dd_real::_nan();
-  }
+        return z;
+    }
 
-  if (abs_a.is_one()) {
-    return (a.is_positive()) ? dd_real(0.0) : dd_real::_pi();
-  }
+    dd_real tan(const dd_real &a) {
+        dd_real s, c;
+        sincos(a, s, c);
+        return s / c;
+    }
 
-  return atan2(sqrt(1.0 - sqr(a)), a);
-}
- 
-dd_real sinh(const dd_real &a) {
-  if (a.is_zero()) {
-    return 0.0;
-  }
+    dd_real asin(const dd_real &a) {
+        dd_real abs_a = std::abs(a);
 
-  if (abs(a) > 0.05) {
-    dd_real ea = exp(a);
-    return mul_pwr2(ea - inv(ea), 0.5);
-  }
+        if (abs_a > 1.0) {
+            dd_real::error("(dd_real::asin): Argument out of domain.");
+            return dd_real::_nan();
+        }
 
-  /* since a is small, using the above formula gives
-     a lot of cancellation.  So use Taylor series.   */
-  dd_real s = a;
-  dd_real t = a;
-  dd_real r = sqr(t);
-  double m = 1.0;
-  double thresh = std::abs((to_double(a)) * dd_real::_eps());
+        if (abs_a.is_one()) {
+            return (a.is_positive()) ? dd_real::_pi2() : -dd_real::_pi2();
+        }
 
-  do {
-    m += 2.0;
-    t *= r;
-    t /= (m-1) * m;
+        return std::atan2(a, std::sqrt(1.0 - sqr(a)));
+    }
 
-    s += t;
-  } while (abs(t) > thresh);
+    dd_real acos(const dd_real &a) {
+        dd_real abs_a = std::abs(a);
 
-  return s;
+        if (abs_a > 1.0) {
+            dd_real::error("(dd_real::acos): Argument out of domain.");
+            return dd_real::_nan();
+        }
 
-}
+        if (abs_a.is_one()) {
+            return (a.is_positive()) ? dd_real(0.0) : dd_real::_pi();
+        }
 
-dd_real cosh(const dd_real &a) {
-  if (a.is_zero()) {
-    return 1.0;
-  }
+        return std::atan2(std::sqrt(1.0 - sqr(a)), a);
+    }
 
-  dd_real ea = exp(a);
-  return mul_pwr2(ea + inv(ea), 0.5);
-}
+    dd_real sinh(const dd_real &a) {
+        if (a.is_zero()) {
+            return 0.0;
+        }
 
-dd_real tanh(const dd_real &a) {
-  if (a.is_zero()) {
-    return 0.0;
-  }
+        if (abs(a) > 0.05) {
+            dd_real ea = std::exp(a);
+            return mul_pwr2(ea - inv(ea), 0.5);
+        }
 
-  if (std::abs(to_double(a)) > 0.05) {
-    dd_real ea = exp(a);
-    dd_real inv_ea = inv(ea);
-    return (ea - inv_ea) / (ea + inv_ea);
-  } else {
-    dd_real s, c;
-    s = sinh(a);
-    c = sqrt(1.0 + sqr(s));
-    return s / c;
-  }
+        /* since a is small, using the above formula gives
+           a lot of cancellation.  So use Taylor series.   */
+        dd_real s = a;
+        dd_real t = a;
+        dd_real r = sqr(t);
+        double m = 1.0;
+        double thresh = std::abs((to_double(a)) * dd_real::_eps());
+
+        do {
+            m += 2.0;
+            t *= r;
+            t /= (m - 1) * m;
+
+            s += t;
+        } while (std::abs(t) > thresh);
+
+        return s;
+
+    }
+
+    dd_real cosh(const dd_real &a) {
+        if (a.is_zero()) {
+            return 1.0;
+        }
+
+        dd_real ea = std::exp(a);
+        return mul_pwr2(ea + inv(ea), 0.5);
+    }
+
+    dd_real tanh(const dd_real &a) {
+        if (a.is_zero()) {
+            return 0.0;
+        }
+
+        if (std::abs(to_double(a)) > 0.05) {
+            dd_real ea = std::exp(a);
+            dd_real inv_ea = inv(ea);
+            return (ea - inv_ea) / (ea + inv_ea);
+        }
+        else {
+            dd_real s, c;
+            s = std::sinh(a);
+            c = std::sqrt(1.0 + sqr(s));
+            return s / c;
+        }
+    }
 }
 
 void sincosh(const dd_real &a, dd_real &s, dd_real &c) {
   if (std::abs(to_double(a)) <= 0.05) {
-    s = sinh(a);
-    c = sqrt(1.0 + sqr(s));
+    s = std::sinh(a);
+    c = std::sqrt(1.0 + sqr(s));
   } else {
-    dd_real ea = exp(a);
+    dd_real ea = std::exp(a);
     dd_real inv_ea = inv(ea);
     s = mul_pwr2(ea - inv_ea, 0.5);
     c = mul_pwr2(ea + inv_ea, 0.5);
   }
 }
 
-dd_real asinh(const dd_real &a) {
-  return log(a + sqrt(sqr(a) + 1.0));
-}
+namespace std {
+    dd_real asinh(const dd_real &a) {
+        return std::log(a + std::sqrt(sqr(a) + 1.0));
+    }
 
-dd_real acosh(const dd_real &a) {
-  if (a < 1.0) {
-    dd_real::error("(dd_real::acosh): Argument out of domain.");
-    return dd_real::_nan();
-  }
+    dd_real acosh(const dd_real &a) {
+        if (a < 1.0) {
+            dd_real::error("(dd_real::acosh): Argument out of domain.");
+            return dd_real::_nan();
+        }
 
-  return log(a + sqrt(sqr(a) - 1.0));
-}
+        return std::log(a + std::sqrt(sqr(a) - 1.0));
+    }
 
-dd_real atanh(const dd_real &a) {
-  if (abs(a) >= 1.0) {
-    dd_real::error("(dd_real::atanh): Argument out of domain.");
-    return dd_real::_nan();
-  }
+    dd_real atanh(const dd_real &a) {
+        if (std::abs(a) >= 1.0) {
+            dd_real::error("(dd_real::atanh): Argument out of domain.");
+            return dd_real::_nan();
+        }
 
-  return mul_pwr2(log((1.0 + a) / (1.0 - a)), 0.5);
-}
+        return mul_pwr2(std::log((1.0 + a) / (1.0 - a)), 0.5);
+    }
 
-QD_API dd_real fmod(const dd_real &a, const dd_real &b) {
-  dd_real n = aint(a / b);
-  return (a - b * n);
+    QD_API dd_real fmod(const dd_real &a, const dd_real &b) {
+        dd_real n = aint(a / b);
+        return (a - b * n);
+    }
+
+    QD_API dd_real fmod(const dd_real &a, double b) {
+        dd_real n = aint(a / b);
+        return (a - b * n);
+    }
+
+    QD_API dd_real fmod(const dd_real &a, int64_t b) {
+        dd_real n = aint(a / b);
+        return (a - b * n);
+    }
+
+    QD_API dd_real fmod(const dd_real &a, int b) {
+        dd_real n = aint(a / b);
+        return (a - b * n);
+    }
 }
 
 QD_API dd_real ddrand() {
@@ -913,7 +957,7 @@ QD_API dd_real polyroot(const dd_real *c, int n,
   for (i = 0; i < max_iter; i++) {
     f = polyeval(c, n, x);
 
-    if (abs(f) < thresh) {
+    if (std::abs(f) < thresh) {
       conv = true;
       break;
     }
@@ -966,7 +1010,7 @@ istream &operator>>(istream &s, dd_real &a) {
 void dd_real::to_digits(char *s, int &expn, int precision) const {
   int D = precision + 1;  /* number of digits to compute */
 
-  dd_real r = abs(*this);
+  dd_real r = std::abs(*this);
   int e;  /* exponent */
   int i, d;
 
@@ -984,9 +1028,9 @@ void dd_real::to_digits(char *s, int &expn, int precision) const {
     r *= dd_real(10.0) ^ 300;
     r /= dd_real(10.0) ^ (e + 300);
   } else if (e > 300) {
-    r = ldexp(r, -53);
+    r = std::ldexp(r, -53);
     r /= dd_real(10.0) ^ e;
-    r = ldexp(r, 53);
+    r = std::ldexp(r, 53);
   } else {
     r /= dd_real(10.0) ^ e;
   }
@@ -1128,7 +1172,7 @@ string dd_real::to_string(int precision, int width, ios_base::fmtflags fmt,
       }
     } else {
       /* Non-zero case */
-      int off = (fixed ? (1 + to_int(floor(log10(abs(*this))))) : 1);
+      int off = (fixed ? (1 + to_int(std::floor(std::log10(std::abs(*this))))) : 1);
       int d = precision + off;
 
       int d_with_extra = d;
@@ -1138,8 +1182,8 @@ string dd_real::to_string(int precision, int width, ios_base::fmtflags fmt,
       // highly special case - fixed mode, precision is zero, abs(*this) < 1.0
       // without this trap a number like 0.9 printed fixed with 0 precision prints as 0
       // should be rounded to 1.
-      if(fixed && (precision == 0) && (abs(*this) < 1.0)){
-    	  if(abs(*this) >= 0.5)
+      if(fixed && (precision == 0) && (std::abs(*this) < 1.0)){
+    	  if(std::abs(*this) >= 0.5)
     		  s += '1';
     	  else
     		  s += '0';
@@ -1206,7 +1250,7 @@ string dd_real::to_string(int precision, int width, ios_base::fmtflags fmt,
     	double from_string = atof(s.c_str());
 
     	// if this ratio is large, then we've got problems
-    	if( fabs( from_string / this->x[0] ) > 3.0 ){
+    	if(std::fabs( from_string / this->x[0] ) > 3.0 ){
 
     		// loop on the string, find the point, move it up one
     		// don't act on the first character
@@ -1220,7 +1264,7 @@ string dd_real::to_string(int precision, int width, ios_base::fmtflags fmt,
 
         	from_string = atof(s.c_str());
         	// if this ratio is large, then the string has not been fixed
-        	if( fabs( from_string / this->x[0] ) > 3.0 ){
+        	if(std::fabs( from_string / this->x[0] ) > 3.0 ){
         		dd_real::error("Re-rounding unsuccessful in large number fixed point trap.") ;
         	}
     	}

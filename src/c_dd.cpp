@@ -105,7 +105,7 @@ void c_dd_copy_d(double a, double *b) {
 
 void c_dd_sqrt(const double *a, double *b) {
   dd_real bb;
-  bb = sqrt(dd_real(a));
+  bb = std::sqrt(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_dd_sqr(const double *a, double *b) {
@@ -116,7 +116,7 @@ void c_dd_sqr(const double *a, double *b) {
 
 void c_dd_abs(const double *a, double *b) {
   dd_real bb;
-  bb = abs(dd_real(a));
+  bb = std::abs(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 
@@ -144,98 +144,98 @@ void c_dd_aint(const double *a, double *b) {
 }
 void c_dd_floor(const double *a, double *b) {
   dd_real bb;
-  bb = floor(dd_real(a));
+  bb = std::floor(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_dd_ceil(const double *a, double *b) {
   dd_real bb;
-  bb = ceil(dd_real(a));
+  bb = std::ceil(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 
 void c_dd_log(const double *a, double *b) {
   dd_real bb;
-  bb = log(dd_real(a));
+  bb = std::log(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_dd_log10(const double *a, double *b) {
   dd_real bb;
-  bb = log10(dd_real(a));
+  bb = std::log10(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_dd_exp(const double *a, double *b) {
   dd_real bb;
-  bb = exp(dd_real(a));
+  bb = std::exp(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 
 void c_dd_sin(const double *a, double *b) {
   dd_real bb;
-  bb = sin(dd_real(a));
+  bb = std::sin(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_dd_cos(const double *a, double *b) {
   dd_real bb;
-  bb = cos(dd_real(a));
+  bb = std::cos(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_dd_tan(const double *a, double *b) {
   dd_real bb;
-  bb = tan(dd_real(a));
+  bb = std::tan(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 
 void c_dd_asin(const double *a, double *b) {
   dd_real bb;
-  bb = asin(dd_real(a));
+  bb = std::asin(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_dd_acos(const double *a, double *b) {
   dd_real bb;
-  bb = acos(dd_real(a));
+  bb = std::acos(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_dd_atan(const double *a, double *b) {
   dd_real bb;
-  bb = atan(dd_real(a));
+  bb = std::atan(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 
 void c_dd_atan2(const double *a, const double *b, double *c) {
   dd_real cc;
-  cc = atan2(dd_real(a), dd_real(b));
+  cc = std::atan2(dd_real(a), dd_real(b));
   TO_DOUBLE_PTR(cc, c);
 }
 
 void c_dd_sinh(const double *a, double *b) {
   dd_real bb;
-  bb = sinh(dd_real(a));
+  bb = std::sinh(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_dd_cosh(const double *a, double *b) {
   dd_real bb;
-  bb = cosh(dd_real(a));
+  bb = std::cosh(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_dd_tanh(const double *a, double *b) {
   dd_real bb;
-  bb = tanh(dd_real(a));
+  bb = std::tanh(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 
 void c_dd_asinh(const double *a, double *b) {
   dd_real bb;
-  bb = asinh(dd_real(a));
+  bb = std::asinh(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_dd_acosh(const double *a, double *b) {
   dd_real bb;
-  bb = acosh(dd_real(a));
+  bb = std::acosh(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 void c_dd_atanh(const double *a, double *b) {
   dd_real bb;
-  bb = atanh(dd_real(a));
+  bb = std::atanh(dd_real(a));
   TO_DOUBLE_PTR(bb, b);
 }
 

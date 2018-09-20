@@ -27,6 +27,7 @@
 #include <iostream>
 #include <string>
 #include <limits>
+#include <type_traits>
 #include <qd/qd_config.h>
 #include <qd/dd_real.h>
 
@@ -75,6 +76,7 @@ struct QD_API qd_real {
 
   static void error(const char *msg);
 
+  bool isnormal() const;
   bool isnan() const;
   bool isfinite() const { return QD_ISFINITE(x[0]); }
   bool isinf() const { return QD_ISINF(x[0]); }
@@ -159,6 +161,27 @@ namespace std {
     static const int digits = 209;
     static const int digits10 = 62;
   };
+
+  // integration with type traits
+  template <>
+  struct is_floating_point<qd_real> : true_type
+  {
+  };
+
+  template <>
+  struct is_signed<qd_real> : true_type
+  {
+  };
+
+  template <>
+  struct is_unsigned<qd_real> : false_type
+  {
+  };
+
+  template <>
+  struct is_integral<qd_real> : false_type
+  {
+  };
 }
 
 QD_API qd_real polyeval(const qd_real *c, int n, const qd_real &x);
@@ -166,11 +189,15 @@ QD_API qd_real polyroot(const qd_real *c, int n,
     const qd_real &x0, int max_iter = 64, double thresh = 0.0);
 
 QD_API qd_real qdrand(void);
-QD_API qd_real sqrt(const qd_real &a);
 
-QD_API inline bool isnan(const qd_real &a) { return a.isnan(); }
-QD_API inline bool isfinite(const qd_real &a) { return a.isfinite(); }
-QD_API inline bool isinf(const qd_real &a) { return a.isinf(); }
+namespace std {
+    QD_API qd_real sqrt(const qd_real &a);
+
+    QD_API inline bool isnormal(const qd_real &a) { return a.isnormal(); }
+    QD_API inline bool isnan(const qd_real &a) { return a.isnan(); }
+    QD_API inline bool isfinite(const qd_real &a) { return a.isfinite(); }
+    QD_API inline bool isinf(const qd_real &a) { return a.isinf(); }
+}
 
 /* Computes  qd * d  where d is known to be a power of 2.
    This can be done component wise.                      */
@@ -226,11 +253,15 @@ QD_API qd_real operator/(int a, const qd_real &b);
 
 
 QD_API qd_real sqr(const qd_real &a);
-QD_API qd_real sqrt(const qd_real &a);
-QD_API qd_real pow(const qd_real &a, int n);
-QD_API qd_real pow(const qd_real &a, int64_t n);
-QD_API qd_real pow(const qd_real &a, double b);
-QD_API qd_real pow(const qd_real &a, const qd_real &b);
+
+namespace std {
+    QD_API qd_real sqrt(const qd_real &a);
+    QD_API qd_real pow(const qd_real &a, int n);
+    QD_API qd_real pow(const qd_real &a, int64_t n);
+    QD_API qd_real pow(const qd_real &a, double b);
+    QD_API qd_real pow(const qd_real &a, const qd_real &b);
+}
+
 QD_API qd_real npwr(const qd_real &a, int n);
 QD_API qd_real npwr(const qd_real &a, int64_t n);
 
@@ -280,48 +311,67 @@ QD_API bool operator!=(const dd_real &a, const qd_real &b);
 QD_API bool operator!=(double a, const qd_real &b);
 QD_API bool operator!=(const qd_real &a, double b);
 
-QD_API qd_real fabs(const qd_real &a);
-QD_API qd_real abs(const qd_real &a);    /* same as fabs */
+namespace std {
+    QD_API qd_real fabs(const qd_real &a);
+    QD_API qd_real abs(const qd_real &a);    /* same as fabs */
 
-QD_API qd_real ldexp(const qd_real &a, int n);
+    QD_API qd_real ldexp(const qd_real &a, int n);
+}
 
 QD_API qd_real nint(const qd_real &a);
 QD_API qd_real quick_nint(const qd_real &a);
-QD_API qd_real floor(const qd_real &a);
-QD_API qd_real ceil(const qd_real &a);
+
+namespace std {
+    QD_API qd_real floor(const qd_real &a);
+    QD_API qd_real ceil(const qd_real &a);
+}
+
 QD_API qd_real aint(const qd_real &a);
 
-QD_API qd_real sin(const qd_real &a);
-QD_API qd_real cos(const qd_real &a);
-QD_API qd_real tan(const qd_real &a);
+namespace std {
+    QD_API qd_real sin(const qd_real &a);
+    QD_API qd_real cos(const qd_real &a);
+    QD_API qd_real tan(const qd_real &a);
+}
+
 QD_API void sincos(const qd_real &a, qd_real &s, qd_real &c);
 
-QD_API qd_real asin(const qd_real &a);
-QD_API qd_real acos(const qd_real &a);
-QD_API qd_real atan(const qd_real &a);
-QD_API qd_real atan2(const qd_real &y, const qd_real &x);
+namespace std {
+    QD_API qd_real asin(const qd_real &a);
+    QD_API qd_real acos(const qd_real &a);
+    QD_API qd_real atan(const qd_real &a);
+    QD_API qd_real atan2(const qd_real &y, const qd_real &x);
 
-QD_API qd_real exp(const qd_real &a);
-QD_API qd_real log(const qd_real &a);
-QD_API qd_real log10(const qd_real &a);
+    QD_API qd_real exp(const qd_real &a);
+    QD_API qd_real log(const qd_real &a);
+    QD_API qd_real log10(const qd_real &a);
 
-QD_API qd_real sinh(const qd_real &a);
-QD_API qd_real cosh(const qd_real &a);
-QD_API qd_real tanh(const qd_real &a);
+    QD_API qd_real sinh(const qd_real &a);
+    QD_API qd_real cosh(const qd_real &a);
+    QD_API qd_real tanh(const qd_real &a);
+}
+
 QD_API void sincosh(const qd_real &a, qd_real &sin_qd, qd_real &cos_qd);
 
-QD_API qd_real asinh(const qd_real &a);
-QD_API qd_real acosh(const qd_real &a);
-QD_API qd_real atanh(const qd_real &a);
+namespace std {
+    QD_API qd_real asinh(const qd_real &a);
+    QD_API qd_real acosh(const qd_real &a);
+    QD_API qd_real atanh(const qd_real &a);
+}
 
 QD_API qd_real qdrand(void);
 
-QD_API qd_real (max)(const qd_real &a, const qd_real &b);
-QD_API qd_real (max)(const qd_real &a, const qd_real &b, const qd_real &c);
-QD_API qd_real (min)(const qd_real &a, const qd_real &b);
-QD_API qd_real (min)(const qd_real &a, const qd_real &b, const qd_real &c);
+namespace std {
+    QD_API qd_real(max)(const qd_real &a, const qd_real &b);
+    QD_API qd_real(max)(const qd_real &a, const qd_real &b, const qd_real &c);
+    QD_API qd_real(min)(const qd_real &a, const qd_real &b);
+    QD_API qd_real(min)(const qd_real &a, const qd_real &b, const qd_real &c);
 
-QD_API qd_real fmod(const qd_real &a, const qd_real &b);
+    QD_API qd_real fmod(const qd_real &a, const qd_real &b);
+    QD_API qd_real fmod(const qd_real &a, double b);
+    QD_API qd_real fmod(const qd_real &a, int64_t b);
+    QD_API qd_real fmod(const qd_real &a, int b);
+}
 
 QD_API std::ostream &operator<<(std::ostream &s, const qd_real &a);
 QD_API std::istream &operator>>(std::istream &s, qd_real &a);

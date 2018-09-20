@@ -132,6 +132,9 @@
 /* Define to 1 to inline commonly used functions. */
 #define QD_INLINE 1
 
+/* Define this macro to be the isnormal(x) function. */
+#define QD_ISNORMAL(x) std::isnormal(x)
+
 /* Define this macro to be the isfinite(x) function. */
 #define QD_ISFINITE(x) std::isfinite(x)
 
