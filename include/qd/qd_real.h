@@ -158,6 +158,8 @@ namespace std {
     inline static double (min)() { return qd_real::_min_normalized(); }
     inline static qd_real (max)() { return qd_real::_max(); }
     inline static qd_real safe_max() { return qd_real::_safe_max(); }
+    inline static qd_real infinity() { return qd_real::_inf(); }
+    static const bool has_infinity = true;
     static const int digits = 209;
     static const int digits10 = 62;
   };
@@ -197,6 +199,11 @@ namespace std {
     QD_API inline bool isnan(const qd_real &a) { return a.isnan(); }
     QD_API inline bool isfinite(const qd_real &a) { return a.isfinite(); }
     QD_API inline bool isinf(const qd_real &a) { return a.isinf(); }
+
+    QD_API inline bool issubnormal(const qd_real &a) {
+        return (fpclassify(a.x[3]) == FP_SUBNORMAL || fpclassify(a.x[2]) == FP_SUBNORMAL ||
+            fpclassify(a.x[1]) == FP_SUBNORMAL || fpclassify(a.x[0]) == FP_SUBNORMAL);
+    }
 }
 
 /* Computes  qd * d  where d is known to be a power of 2.
@@ -379,5 +386,98 @@ QD_API std::istream &operator>>(std::istream &s, qd_real &a);
 #include <qd/qd_inline.h>
 #endif
 
-#endif /* _QD_QD_REAL_H */
+namespace std {
+    QD_API inline qd_real nextafter(const qd_real & from, const qd_real & to) {
+        if (from.isnan() || to.isnan()) {
+            const double quite_NaN = numeric_limits<double>::quiet_NaN();
+            return qd_real(quite_NaN, quite_NaN, quite_NaN, quite_NaN);
+        }
 
+        if (from < to) {
+            const double pos_infinity = numeric_limits<double>::infinity();
+
+            const double next_x0 = nextafter(from.x[0], pos_infinity);
+            if (isinf(next_x0)) {
+                return qd_real::_inf();
+            }
+
+            if (fpclassify(next_x0) != FP_SUBNORMAL && !next_x0) {
+                const double x0_max = next_x0 - from.x[0];
+
+                const double next_x1 = nextafter(from.x[1], pos_infinity);
+                if (next_x1 <= x0_max) {
+                    if (from.x[1]) {
+                        const double x1_max = next_x1 - from.x[1];
+
+                        const double next_x2 = nextafter(from.x[2], pos_infinity);
+                        if (next_x2 <= x1_max) {
+                            if (from.x[2]) {
+                                const double x2_max = next_x2 - from.x[2];
+
+                                const double next_x3 = nextafter(from.x[3], pos_infinity);
+                                if (next_x3 < x2_max) {
+                                    return qd_real(from.x[0], from.x[1], from.x[2], next_x3);
+                                }
+                            }
+
+                            if (next_x2 != x1_max) {
+                                return qd_real(from.x[0], from.x[1], next_x2, 0);
+                            }
+                        }
+                    }
+
+                    if (next_x1 != x0_max) {
+                        return qd_real(from.x[0], next_x1, 0, 0);
+                    }
+                }
+            }
+
+            return qd_real(next_x0, 0, 0, 0);
+        }
+        else if (from > to) {
+            const double neg_infinity = -numeric_limits<double>::infinity();
+
+            const double next_x0 = nextafter(from.x[0], neg_infinity);
+            if (isinf(next_x0)) {
+                return -qd_real::_inf();
+            }
+
+            if (fpclassify(next_x0) != FP_SUBNORMAL && !next_x0) {
+                const double x0_min = next_x0 - from.x[0];
+
+                const double next_x1 = nextafter(from.x[1], neg_infinity);
+                if (next_x1 >= x0_min) {
+                    if (from.x[1]) {
+                        const double x1_min = next_x1 - from.x[1];
+
+                        const double next_x2 = nextafter(from.x[2], neg_infinity);
+                        if (next_x2 >= x1_min) {
+                            if (from.x[2]) {
+                                const double x2_min = next_x2 - from.x[2];
+
+                                const double next_x3 = nextafter(from.x[3], neg_infinity);
+                                if (next_x3 > x2_min) {
+                                    return qd_real(from.x[0], from.x[1], from.x[2], next_x3);
+                                }
+                            }
+
+                            if (next_x2 != x1_min) {
+                                return qd_real(from.x[0], from.x[1], next_x2, 0);
+                            }
+                        }
+                    }
+
+                    if (next_x1 != x0_min) {
+                        return qd_real(from.x[0], next_x1, 0, 0);
+                    }
+                }
+            }
+
+            return qd_real(next_x0, 0, 0, 0);
+        }
+
+        return to;
+    }
+}
+
+#endif /* _QD_QD_REAL_H */

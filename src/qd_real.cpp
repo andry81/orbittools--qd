@@ -29,6 +29,16 @@
 #include <qd/qd_inline.h>
 #endif
 
+#include <qd/globals.h>
+
+// WORKAROUND (from patcher):
+//  Unit tests over functionality linked versus QD trigonometrics revealed fluctuation out of bounds for some trigonometric functions.
+//  For example, function `dd_real::asin` has returned a value greater than 90 degrees in radians by absolute value (x[0]=-90, x[1] < 0).
+//  This could happend because of a sloppy division inside an implementation or because of another issue around fast calculation.
+//  Whatever happend from now and on we can not rely on the output range of QD trigonometrics and must do truncate it as documented in
+//  the C++ math standard functions!
+//
+
 using std::cout;
 using std::cerr;
 using std::endl;

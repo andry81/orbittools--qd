@@ -29,6 +29,16 @@
 #include <qd/dd_inline.h>
 #endif
 
+#include <qd/globals.h>
+
+// WORKAROUND (from patcher):
+//  Unit tests over functionality linked versus QD trigonometrics revealed fluctuation out of bounds for some trigonometric functions.
+//  For example, function `dd_real::asin` has returned a value greater than 90 degrees in radians by absolute value (x[0]=-90, x[1] < 0).
+//  This could happend because of a sloppy division inside an implementation or because of another issue around fast calculation.
+//  Whatever happend from now and on we can not rely on the output range of QD trigonometrics and must do truncate it as documented in
+//  the C++ math standard functions!
+//
+
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -471,14 +481,19 @@ namespace std {
         if (k == 0) {
             switch (j) {
             case 0:
-                return sin_taylor(t);
+                r = sin_taylor(t);
+                break;
             case 1:
-                return cos_taylor(t);
+                r = cos_taylor(t);
+                break;
             case -1:
-                return -cos_taylor(t);
+                r = -cos_taylor(t);
+                break;
             default:
-                return -sin_taylor(t);
+                r = -sin_taylor(t);
             }
+
+            return qd::fix_float_trigonometric_range_factor(r);
         }
 
         dd_real u(cos_table[abs_k - 1][0], cos_table[abs_k - 1][1]);
@@ -518,7 +533,7 @@ namespace std {
             }
         }
 
-        return r;
+        return qd::fix_float_trigonometric_range_factor(r);
     }
 
     dd_real cos(const dd_real &a) {
@@ -554,14 +569,19 @@ namespace std {
         if (k == 0) {
             switch (j) {
             case 0:
-                return cos_taylor(t);
+                r = cos_taylor(t);
+                break;
             case 1:
-                return -sin_taylor(t);
+                r = -sin_taylor(t);
+                break;
             case -1:
-                return sin_taylor(t);
+                r = sin_taylor(t);
+                break;
             default:
-                return -cos_taylor(t);
+                r = -cos_taylor(t);
             }
+
+            return qd::fix_float_trigonometric_range_factor(r);
         }
 
         dd_real sin_t, cos_t;
@@ -602,7 +622,7 @@ namespace std {
             }
         }
 
-        return r;
+        return qd::fix_float_trigonometric_range_factor(r);
     }
 }
 
@@ -663,24 +683,25 @@ void sincos(const dd_real &a, dd_real &sin_a, dd_real &cos_a) {
   }
 
   if (abs_j == 0) {
-    sin_a = s;
-    cos_a = c;
+    sin_a = qd::fix_float_trigonometric_range_factor(s);
+    cos_a = qd::fix_float_trigonometric_range_factor(c);
   } else if (j == 1) {
-    sin_a = c;
-    cos_a = -s;
+    sin_a = qd::fix_float_trigonometric_range_factor(c);
+    cos_a = qd::fix_float_trigonometric_range_factor(-s);
   } else if (j == -1) {
-    sin_a = -c;
-    cos_a = s;
+    sin_a = qd::fix_float_trigonometric_range_factor(-c);
+    cos_a = qd::fix_float_trigonometric_range_factor(s);
   } else {
-    sin_a = -s;
-    cos_a = -c;
+    sin_a = qd::fix_float_trigonometric_range_factor(-s);
+    cos_a = qd::fix_float_trigonometric_range_factor(-c);
   }
-  
 }
 
 namespace std {
     dd_real atan(const dd_real &a) {
-        return std::atan2(a, dd_real(1.0));
+        const dd_real r = std::atan2(a, dd_real(1.0));
+
+        return qd::fix_float_trigonometric_range_atan<dd_real>(r, []() { return dd_real::_pi(); });
     }
 
     dd_real atan2(const dd_real &y, const dd_real &x) {
@@ -742,7 +763,7 @@ namespace std {
             z -= (xx - cos_z) / sin_z;
         }
 
-        return z;
+        return qd::fix_float_trigonometric_range_atan2<dd_real>(z, []() { return dd_real::_pi(); });
     }
 
     dd_real tan(const dd_real &a) {
@@ -763,7 +784,9 @@ namespace std {
             return (a.is_positive()) ? dd_real::_pi2() : -dd_real::_pi2();
         }
 
-        return std::atan2(a, std::sqrt(1.0 - sqr(a)));
+        const dd_real r = std::atan2(a, std::sqrt(1.0 - sqr(a)));
+
+        return qd::fix_float_trigonometric_range_asin<dd_real>(r, []() { return dd_real::_pi(); });
     }
 
     dd_real acos(const dd_real &a) {
@@ -778,7 +801,9 @@ namespace std {
             return (a.is_positive()) ? dd_real(0.0) : dd_real::_pi();
         }
 
-        return std::atan2(std::sqrt(1.0 - sqr(a)), a);
+        const dd_real r = std::atan2(std::sqrt(1.0 - sqr(a)), a);
+
+        return qd::fix_float_trigonometric_range_acos<dd_real>(r, []() { return dd_real::_pi(); });
     }
 
     dd_real sinh(const dd_real &a) {
@@ -1022,7 +1047,7 @@ void dd_real::to_digits(char *s, int &expn, int precision) const {
   }
 
   /* First determine the (approximate) exponent. */
-  e = to_int(std::floor(std::log10(std::abs(x[0]))));
+  e = static_cast<int>(std::floor(std::log10(std::abs(x[0]))));
 
   if (e < -300) {
     r *= dd_real(10.0) ^ 300;

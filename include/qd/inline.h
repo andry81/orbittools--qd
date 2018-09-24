@@ -70,12 +70,35 @@ inline void split(double a, double &hi, double &lo) {
     a *= 3.7252902984619140625e-09;  // 2^-28
     temp = _QD_SPLITTER * a;
     hi = temp - (temp - a);
+
+    // WORKAROUND: (by traces of bug around `dd_real(DBL_MAX) / 1.0` expression)
+    //  Because of floating point fluctuation the `hi` can be accidently greater/lesser than _QD_SPLIT_THRESH/-_QD_SPLIT_THRESH and the +-infinity would be as a result.
+    //  We must truncate it to avoid the infinity.
+    //
+    if (hi > _QD_SPLIT_THRESH) {
+        hi = _QD_SPLIT_THRESH;
+    }
+    else if (hi < -_QD_SPLIT_THRESH) {
+        hi = -_QD_SPLIT_THRESH;
+    }
+
     lo = a - hi;
     hi *= 268435456.0;          // 2^28
     lo *= 268435456.0;          // 2^28
   } else {
     temp = _QD_SPLITTER * a;
     hi = temp - (temp - a);
+
+    // WORKAROUND:
+    //  Just in case as did the workaround above.
+    //
+    if (hi > _QD_SPLIT_THRESH) {
+        hi = _QD_SPLIT_THRESH;
+    }
+    else if (hi < -_QD_SPLIT_THRESH) {
+        hi = -_QD_SPLIT_THRESH;
+    }
+
     lo = a - hi;
   }
 }

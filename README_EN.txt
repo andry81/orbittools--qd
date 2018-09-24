@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2018.09.20
+* 2018.09.21
 * qd
 
 1. DESCRIPTION
@@ -43,6 +43,10 @@ From authors:
 The original library patched to fix these issue:
 
 1. Missed overloading for constructors, operators and functions.
+
+2. Fix trigonometric range before call and after call to triginometric
+   functions because of sloppy QD arithmetic outside and inside a function
+   call.
 
 Cmake scripts uses the cmake modules from the tacklelib library:
 

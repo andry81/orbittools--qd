@@ -1,3 +1,7 @@
+2018.09.24:
+* fixed: rare out-of-range bug in output from trigonometric functions like `dd_real::asin` because of sloppy arithmetic outside and inside a function call
+* new: overload for QD math `nextafter` function
+
 2018.09.20:
 * changed: missed fmod function overload
 * refactor: most of standard math functions injected into std namespace to enable overload from std namespace.
