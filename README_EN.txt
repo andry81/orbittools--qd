@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2018.09.21
+* 2018.09.25
 * qd
 
 1. DESCRIPTION
@@ -40,7 +40,7 @@ From authors:
   programs) read/write statements need to be changed. PSLQ and numerical
   quadrature programs are included. 
 
-The original library patched to fix these issue:
+The original library patched to fix these issues:
 
 1. Missed overloading for constructors, operators and functions.
 
