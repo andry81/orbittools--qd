@@ -6,6 +6,7 @@ project("qd")
 
 set(PROJECT_LIB_NAME qd)
 
+discover_variable(ENABLE_QD_INTEGRATION STRING "enable Qd library usage from outside")
 discover_variable(ENABLE_QD_QD_INTEGRATION STRING "enable Qd library qd_real replacement for the double")
 discover_variable(ENABLE_QD_DD_INTEGRATION STRING "enable Qd library dd_real replacement for the double")
 
@@ -26,15 +27,21 @@ target_include_directories(${PROJECT_LIB_NAME}
     ${CMAKE_CURRENT_LIST_DIR}
 )
 
-if (ENABLE_QD_QD_INTEGRATION)
+if (DEFINED ENABLE_QD_INTEGRATION)
   add_target_compile_definitions(${PROJECT_LIB_NAME} *
     PUBLIC
-      ENABLE_QD_QD_INTEGRATION
+      ENABLE_QD_INTEGRATION=${ENABLE_QD_INTEGRATION}
   )
 endif()
-if (ENABLE_QD_DD_INTEGRATION)
+if (DEFINED ENABLE_QD_QD_INTEGRATION)
   add_target_compile_definitions(${PROJECT_LIB_NAME} *
     PUBLIC
-      ENABLE_QD_DD_INTEGRATION
+      ENABLE_QD_QD_INTEGRATION=${ENABLE_QD_QD_INTEGRATION}
+  )
+endif()
+if (DEFINED ENABLE_QD_DD_INTEGRATION)
+  add_target_compile_definitions(${PROJECT_LIB_NAME} *
+    PUBLIC
+      ENABLE_QD_DD_INTEGRATION=${ENABLE_QD_DD_INTEGRATION}
   )
 endif()

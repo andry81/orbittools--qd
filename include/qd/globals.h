@@ -10,63 +10,38 @@
 #include <functional>
 
 
-#ifndef USER_STD_HAS_IDENTITY
-#define USER_STD_HAS_IDENTITY
+// disabled by default
 
-namespace _std
-{
-  template <typename T>
-  struct identity
-  {
-    typedef T type;
-  };
-}
+#ifndef ENABLE_QD_INTEGRATION
+#define ENABLE_QD_INTEGRATION 0
+#endif
 
+#ifndef ENABLE_QD_DD_INTEGRATION
+#define ENABLE_QD_DD_INTEGRATION 0
+#endif
+
+#ifndef ENABLE_QD_QD_INTEGRATION
+#define ENABLE_QD_QD_INTEGRATION 0
 #endif
 
 // cast functions
 
-#ifndef QD_INTEGRATION_ENABLED
-#ifdef ENABLE_QD_QD_INTEGRATION
-namespace qd
-{
-  inline qd_real to_real(int i) { return i; }
-  inline qd_real to_real(long i) { return int64_t(i); }
-  inline qd_real to_real(int64_t i) { return i; }
-  inline qd_real to_real(double d) { return d; }
-}
+#if !ENABLE_QD_INTEGRATION
 
-#define QD_INTEGRATION_ENABLED 1
-
-#elif defined(ENABLE_QD_DD_INTEGRATION)
-namespace qd
-{
-  inline dd_real to_real(int i) { return i; }
-  inline dd_real to_real(long i) { return int64_t(i); }
-  inline dd_real to_real(int64_t i) { return i; }
-  inline dd_real to_real(double d) { return d; }
-}
-
-#define QD_INTEGRATION_ENABLED 1
-
-#else
+#ifndef TO_DOUBLE_DEFINED
+#define TO_DOUBLE_DEFINED
 
 inline int to_double(int i) { return i; }
 inline long to_double(long i) { return i; }
 inline int64_t to_double(int64_t i) { return i; }
 inline double to_double(double d) { return d; }
 
-namespace qd
-{
-  inline double to_real(int i) { return double(i); }
-  inline double to_real(long i) { return double(i); }
-  inline double to_real(int64_t i) { return double(i); }
-  inline double to_real(double d) { return d; }
-}
-
-#define QD_INTEGRATION_ENABLED 0
+#endif
 
 #endif
+
+#ifndef AS_DOUBLE_DEFINED
+#define AS_DOUBLE_DEFINED
 
 template <typename T>
 inline double as_double(T d) { return double(d); }
@@ -75,51 +50,6 @@ inline double as_double(T d) { return double(d); }
 
 namespace qd
 {
-  inline qd_real cast_to(const qd_real & qd, _std::identity<qd_real>)
-  {
-    return qd;
-  }
-
-  inline dd_real cast_to(const dd_real & dd, _std::identity<dd_real>)
-  {
-    return dd;
-  }
-
-  inline dd_real cast_to(const qd_real & qd, _std::identity<dd_real>)
-  {
-    return dd_real(qd.x[0], qd.x[1]);
-  }
-
-  inline qd_real cast_to(const dd_real & dd, _std::identity<qd_real>)
-  {
-    return qd_real(dd.x[0], dd.x[1], 0, 0);
-  }
-
-  inline double cast_to(const qd_real & qd, _std::identity<double>)
-  {
-    return to_double(qd);
-  }
-
-  inline double cast_to(const dd_real & dd, _std::identity<double>)
-  {
-    return to_double(dd);
-  }
-
-  inline double cast_to(double d, _std::identity<double>)
-  {
-    return d;
-  }
-
-  inline int cast_to(double d, _std::identity<int>)
-  {
-      return int(d);
-  }
-
-  inline int cast_to(int i, _std::identity<int>)
-  {
-    return i;
-  }
-
   template <typename T>
   inline bool is_valid_float(const T & v)
   {

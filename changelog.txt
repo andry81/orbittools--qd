@@ -1,3 +1,8 @@
+2018.11.20:
+* new: ENABLE_QD_INTEGRATION definition usage
+* refactor: ENABLE_* variables usage refactor
+* refactor: removed QD_INTEGRATION_ENABLED variable usage
+
 2018.09.24:
 * fixed: rare out-of-range bug in output from trigonometric functions like `dd_real::asin` because of sloppy arithmetic outside and inside a function call
 * new: overload for QD math `nextafter` function
