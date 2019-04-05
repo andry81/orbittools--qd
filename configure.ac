@@ -1,8 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-define([QD_PATCH_VERSION], 12)
+define([QD_PATCH_VERSION], 22)
 AC_PREREQ(2.60)
-AC_INIT(qd, 2.3.QD_PATCH_VERSION, yozo@cs.berkeley.edu)
+AC_INIT(qd, 2.3.QD_PATCH_VERSION, dhbailey@lbl.gov)
 AC_CONFIG_SRCDIR([src/qd_real.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -17,7 +17,7 @@ AC_DEFINE_UNQUOTED([PATCH_VERSION],$PATCH_VERSION,[qd patch number (sub minor ve
 echo "configuring $PACKAGE $VERSION..."
 
 AC_CONFIG_AUX_DIR(config)
-AM_INIT_AUTOMAKE([nostdinc])
+AM_INIT_AUTOMAKE([nostdinc foreign])
 AM_CONFIG_HEADER([config.h])
 AM_CONFIG_HEADER([include/qd/qd_config.h])
 
@@ -318,7 +318,7 @@ AC_PROG_LIBTOOL
 # Output
 AC_CONFIG_FILES([Makefile config/Makefile src/Makefile include/Makefile 
                  tests/Makefile fortran/Makefile qd-config 
-                 fortran/second.f])
+                 fortran/second.f qd.pc])
 AC_OUTPUT
 chmod +x qd-config
 

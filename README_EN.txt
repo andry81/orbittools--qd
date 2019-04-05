@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2018.09.25
+* 2019.02.09
 * qd
 
 1. DESCRIPTION
@@ -18,7 +18,7 @@ http://crd-legacy.lbl.gov/~dhbailey/mpdist/
 Other references:
 http://crd.lbl.gov/software/applied-mathematics-software/
 
-Based on version 2.3.20.
+Based on version 2.3.22.
 
 Most of standard math functions injected into std namespace to enable overload
 from std namespace.
