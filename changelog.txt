@@ -1,3 +1,6 @@
+2019.10.07:
+* changed: cmake: switch to last tacklelib library
+
 2019.02.09:
 * changed: merge with the latest library changes taken from version 2.3.22 (2018.11.09) from http://crd-legacy.lbl.gov/~dhbailey/mpdist/
 
