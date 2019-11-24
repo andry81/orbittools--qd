@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2019.02.09
+* 2019.11.24
 * qd
 
 1. DESCRIPTION
@@ -18,7 +18,7 @@ http://crd-legacy.lbl.gov/~dhbailey/mpdist/
 Other references:
 http://crd.lbl.gov/software/applied-mathematics-software/
 
-Based on version 2.3.22.
+Based on version: 2.3.22.
 
 Most of standard math functions injected into std namespace to enable overload
 from std namespace.
@@ -62,11 +62,14 @@ https://en.wikipedia.org/wiki/MIT_License)
 3. REPOSITORIES
 -------------------------------------------------------------------------------
 Primary:
-  * https://svn.code.sf.net/p/orbittools/qd_/trunk
+  * https://sf.net/p/orbittools/qd_/HEAD/tree/trunk
+    https://svn.code.sf.net/p/orbittools/qd_/trunk
 First mirror:
-  * https://github.com/andry81/orbittools--qd.git
+  * https://github.com/andry81/orbittools--qd/tree/trunk
+    https://github.com/andry81/orbittools--qd.git
 Second mirror:
-  * https://bitbucket.org/andry81/orbittools-qd.git
+  * https://bitbucket.org/andry81/orbittools-qd/src/trunk
+    https://bitbucket.org/andry81/orbittools-qd.git
 
 -------------------------------------------------------------------------------
 4. INSTALLATION
