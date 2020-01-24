@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2019.11.24
+* 2020.01.24
 * qd
 
 1. DESCRIPTION
@@ -13,15 +13,11 @@
 1. DESCRIPTION
 -------------------------------------------------------------------------------
 QD patched sources fork from:
-http://crd-legacy.lbl.gov/~dhbailey/mpdist/
+https://www.davidhbailey.com/dhbsoftware/
 
 Other references:
+http://crd-legacy.lbl.gov/~dhbailey/mpdist/
 http://crd.lbl.gov/software/applied-mathematics-software/
-
-Based on version: 2.3.22.
-
-Most of standard math functions injected into std namespace to enable overload
-from std namespace.
 
 From authors:
 
@@ -55,8 +51,8 @@ https://svn.code.sf.net/p/tacklelib/cmake/trunk
 -------------------------------------------------------------------------------
 2. LICENSE
 -------------------------------------------------------------------------------
-The MIT license (see included text file "license.txt" or
-https://en.wikipedia.org/wiki/MIT_License)
+modified BSD license
+(see included text file "COPYING" and "BSD-LBNL-License.doc")
 
 -------------------------------------------------------------------------------
 3. REPOSITORIES

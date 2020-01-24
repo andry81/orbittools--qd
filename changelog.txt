@@ -1,3 +1,7 @@
+2020.01.24:
+* fixed: license information
+* changed: cutted off the version reference from the readme file as may change frequently
+
 2019.11.24:
 * changed: readme update
 
@@ -5,7 +9,7 @@
 * changed: cmake: switch to last tacklelib library
 
 2019.02.09:
-* changed: merge with the latest library changes taken from version 2.3.22 (2018.11.09) from http://crd-legacy.lbl.gov/~dhbailey/mpdist/
+* changed: merge with the library changes from version 2.3.22 (2018.11.09) from http://crd-legacy.lbl.gov/~dhbailey/mpdist/
 
 2018.11.20:
 * new: ENABLE_QD_INTEGRATION definition usage
