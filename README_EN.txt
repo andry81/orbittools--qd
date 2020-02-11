@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2020.01.24
+* 2020.02.10
 * qd
 
 1. DESCRIPTION
@@ -7,7 +7,7 @@
 3. REPOSITORIES
 4. INSTALLATION
 5. KNOWN ISSUES
-6. AUTHOR EMAIL
+6. AUTHOR
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -81,6 +81,6 @@ N/A
    double type mantissa will be truncated to fit the mantissa.
 
 -------------------------------------------------------------------------------
-6. AUTHOR EMAIL
+6. AUTHOR
 -------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)
