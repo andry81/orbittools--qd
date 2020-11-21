@@ -1,4 +1,5 @@
 * text=auto !eol
+.github/FUNDING.yml -text
 /AUTHORS -text
 /BSD-LBNL-License.doc -text
 /CMakeLists.txt -text
